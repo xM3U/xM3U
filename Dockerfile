@@ -7,6 +7,7 @@ RUN go get github.com/koron/go-ssdp && \
 	go get github.com/gorilla/websocket && \
 	go get github.com/kardianos/osext
 
+
 # Copy of source files
 COPY . .
 
@@ -28,12 +29,12 @@ ENV GID=1000
 
 EXPOSE 34400   
 
-# User creation and installation of ca-certificates
+# User creation and installation of ca-certificates, ffmpeg and vlc
 RUN addgroup -g $UID -S xteve  && \
 	adduser -u $GID -S xteve -G xteve && \
 	mkdir /data && \
 	chown $UID:$GID /data && \
-	apk add --no-cache ca-certificates && \
+	apk add --no-cache ca-certificates ffmpeg vlc && \
 	rm -rf /var/cache/apk/*
 
 # Copy binary from build stage
