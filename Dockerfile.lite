@@ -34,7 +34,7 @@ RUN addgroup -g $UID -S xteve  && \
 	adduser -u $GID -S xteve -G xteve && \
 	mkdir /data && \
 	chown $UID:$GID /data && \
-	apk add --no-cache ca-certificates && \
+	apk add --no-cache ca-certificates curl && \
 	rm -rf /var/cache/apk/*
 
 # Copy binary from build stage
