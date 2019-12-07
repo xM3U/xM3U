@@ -1,3 +1,10 @@
+#### 2.1.0.0105-beta
+```diff
++ Fixed wrong buffer value in log
++ New setting: URL protocol for M3U and XML file
++ Add xml tag premiere to xteve.xml
+```
+
 #### 2.1.0.0101-beta
 ```diff
 + Reverse proxy fix
