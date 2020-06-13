@@ -43,6 +43,6 @@ COPY --from=builder /root/xteve /usr/local/bin/
 USER xteve
 
 HEALTHCHECK --interval=1m --timeout=3s \
-  CMD curl --fail http://localhost:33440/web || exit 1
+  CMD curl --fail http://localhost:34400/web || exit 1
 
 VOLUME ["/data"]
