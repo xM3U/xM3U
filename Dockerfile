@@ -2,14 +2,11 @@ FROM golang AS builder
 
 WORKDIR /root
 
-# Dependencies
-RUN go install github.com/koron/go-ssdp@latest && \
-	go install github.com/gorilla/websocket@latest && \
-	go install github.com/kardianos/osext@latest
-
-
 # Copy of source files
 COPY . .
+
+# Dependencies
+RUN go mod download
 
 # Disable CGO Tool
 ENV CGO_ENABLED=0
