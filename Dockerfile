@@ -3,9 +3,9 @@ FROM golang AS builder
 WORKDIR /root
 
 # Dependencies
-RUN go install github.com/koron/go-ssdp && \
-	go install github.com/gorilla/websocket && \
-	go install github.com/kardianos/osext
+RUN go install github.com/koron/go-ssdp@latest && \
+	go install github.com/gorilla/websocket@latest && \
+	go install github.com/kardianos/osext@latest
 
 
 # Copy of source files
