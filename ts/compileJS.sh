@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tsc *.ts --outDir ../html/js/
+esbuild --outdir=html/js ts/*.ts --drop:console --platform=browser --minify
