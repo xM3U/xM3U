@@ -21,7 +21,12 @@ tasks:
     generates:
       - ./xteve
     cmds:
-      - go build -o xteve ./xteve.go
+      - go build -o xteve ./cmd/xteve/main.go
+
+  run:
+    desc: Run the binary
+    cmds:
+      - go run ./cmd/xteve/main.go
 
   test:
     desc: Run tests
