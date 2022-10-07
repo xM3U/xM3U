@@ -11,7 +11,6 @@ import (
 )
 
 func zipFiles(sourceFiles []string, target string) error {
-
 	zipfile, err := os.Create(target)
 	if err != nil {
 		return err
@@ -34,7 +33,6 @@ func zipFiles(sourceFiles []string, target string) error {
 		}
 
 		filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
-
 			if err != nil {
 				return err
 			}
@@ -72,7 +70,6 @@ func zipFiles(sourceFiles []string, target string) error {
 			_, err = io.Copy(writer, file)
 
 			return err
-
 		})
 
 	}
@@ -81,13 +78,12 @@ func zipFiles(sourceFiles []string, target string) error {
 }
 
 func extractZIP(archive, target string) (err error) {
-
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(target, 0755); err != nil {
+	if err := os.MkdirAll(target, 0o755); err != nil {
 		return err
 	}
 
@@ -121,8 +117,7 @@ func extractZIP(archive, target string) (err error) {
 }
 
 func extractGZIP(gzipBody []byte, fileSource string) (body []byte, err error) {
-
-	var b = bytes.NewBuffer(gzipBody)
+	b := bytes.NewBuffer(gzipBody)
 
 	var r io.Reader
 	r, err = gzip.NewReader(b)
@@ -148,7 +143,6 @@ func extractGZIP(gzipBody []byte, fileSource string) (body []byte, err error) {
 }
 
 func compressGZIP(data *[]byte, file string) (err error) {
-
 	if len(file) != 0 {
 
 		f, err := os.Create(file)

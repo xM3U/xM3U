@@ -8,7 +8,6 @@ import (
 
 // InitMaintenance : Wartungsprozess initialisieren
 func InitMaintenance() (err error) {
-
 	rand.Seed(time.Now().Unix())
 	System.TimeForAutoUpdate = fmt.Sprintf("0%d%d", randomTime(0, 2), randomTime(10, 59))
 
@@ -18,16 +17,14 @@ func InitMaintenance() (err error) {
 }
 
 func maintenance() {
-
 	for {
 
-		var t = time.Now()
+		t := time.Now()
 
 		// Aktualisierung der Playlist und XMLTV Dateien
 		if System.ScanInProgress == 0 {
 
 			for _, schedule := range Settings.Update {
-
 				if schedule == t.Format("1504") {
 
 					showInfo("Update:" + schedule)
@@ -35,7 +32,7 @@ func maintenance() {
 					// Backup erstellen
 					err := xTeVeAutoBackup()
 					if err != nil {
-						ShowError(err, 000)
+						ShowError(err, 0o00)
 					}
 
 					// Playlist und XMLTV Dateien aktualisieren
@@ -49,7 +46,7 @@ func maintenance() {
 					// Datenbank für DVR erstellen
 					err = buildDatabaseDVR()
 					if err != nil {
-						ShowError(err, 000)
+						ShowError(err, 0o00)
 					}
 
 					if Settings.CacheImages == false && System.ImageCachingInProgress == 0 {
@@ -61,7 +58,6 @@ func maintenance() {
 					buildXEPG(false)
 
 				}
-
 			}
 
 			// Update xTeVe (Binary)

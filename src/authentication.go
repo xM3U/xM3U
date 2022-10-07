@@ -10,13 +10,12 @@ import (
 )
 
 func activatedSystemAuthentication() (err error) {
-
 	err = authentication.Init(System.Folder.Config, 60)
 	if err != nil {
 		return
 	}
 
-	var defaults = make(map[string]interface{})
+	defaults := make(map[string]interface{})
 	defaults["authentication.web"] = false
 	defaults["authentication.pms"] = false
 	defaults["authentication.xml"] = false
@@ -27,8 +26,7 @@ func activatedSystemAuthentication() (err error) {
 }
 
 func createFirstUserForAuthentication(username, password string) (token string, err error) {
-
-	var authenticationErr = func(err error) {
+	authenticationErr := func(err error) {
 		if err != nil {
 			return
 		}
@@ -43,7 +41,7 @@ func createFirstUserForAuthentication(username, password string) (token string, 
 	token, err = authentication.CheckTheValidityOfTheToken(token)
 	authenticationErr(err)
 
-	var userData = make(map[string]interface{})
+	userData := make(map[string]interface{})
 	userData["username"] = username
 	userData["authentication.web"] = true
 	userData["authentication.pms"] = true
@@ -62,7 +60,6 @@ func createFirstUserForAuthentication(username, password string) (token string, 
 }
 
 func tokenAuthentication(token string) (newToken string, err error) {
-
 	if System.ConfigurationWizard == true {
 		return
 	}
@@ -73,7 +70,6 @@ func tokenAuthentication(token string) (newToken string, err error) {
 }
 
 func basicAuth(r *http.Request, level string) (username string, err error) {
-
 	err = errors.New("User authentication failed")
 
 	auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
@@ -86,10 +82,9 @@ func basicAuth(r *http.Request, level string) (username string, err error) {
 	pair := strings.SplitN(string(payload), ":", 2)
 
 	username = pair[0]
-	var password = pair[1]
+	password := pair[1]
 
 	token, err := authentication.UserAuthentication(username, password)
-
 	if err != nil {
 		return
 	}
@@ -102,8 +97,8 @@ func basicAuth(r *http.Request, level string) (username string, err error) {
 func urlAuth(r *http.Request, requestType string) (err error) {
 	var level, token string
 
-	var username = r.URL.Query().Get("username")
-	var password = r.URL.Query().Get("password")
+	username := r.URL.Query().Get("username")
+	password := r.URL.Query().Get("password")
 
 	switch requestType {
 
@@ -133,8 +128,7 @@ func urlAuth(r *http.Request, requestType string) (err error) {
 }
 
 func checkAuthorizationLevel(token, level string) (err error) {
-
-	var authenticationErr = func(err error) {
+	authenticationErr := func(err error) {
 		if err != nil {
 			return
 		}
@@ -147,19 +141,15 @@ func checkAuthorizationLevel(token, level string) (err error) {
 	authenticationErr(err)
 
 	if len(userData) > 0 {
-
 		if v, ok := userData[level].(bool); ok {
-
 			if v == false {
 				err = errors.New("No authorization")
 			}
-
 		} else {
 			userData[level] = false
 			err = authentication.WriteUserData(userID, userData)
 			err = errors.New("No authorization")
 		}
-
 	} else {
 		err = authentication.WriteUserData(userID, userData)
 		err = errors.New("No authorization")

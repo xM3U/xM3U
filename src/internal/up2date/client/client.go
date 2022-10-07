@@ -25,7 +25,7 @@ type ClientInfo struct {
 	Response ServerResponse `json:"response,omitempty"`
 }
 
-//ServerResponse : Response from server after client request
+// ServerResponse : Response from server after client request
 type ServerResponse struct {
 	Status    bool   `json:"status,omitempty"`
 	Reason    string `json:"reason,omitempty"`
@@ -49,14 +49,12 @@ func Init() {
 
 // GetVersion : Information about the latest version
 func GetVersion() (err error) {
-
 	Updater.CMD = "getVersion"
 	err = serverRequest()
 	return
 }
 
 func serverRequest() (err error) {
-
 	var serverResponse ServerResponse
 	jsonByte, err := json.MarshalIndent(Updater, "", "  ")
 	if err == nil {
@@ -66,7 +64,7 @@ func serverRequest() (err error) {
 		if err != nil {
 			return err
 		}
-		var server = u.Host
+		server := u.Host
 
 		timeout := time.Duration(1 * time.Second)
 		_, err = net.DialTimeout("tcp", server, timeout)
@@ -83,10 +81,9 @@ func serverRequest() (err error) {
 		}
 
 		resp, err := client.Do(redirect)
-
 		if err != nil {
 			// Redirect
-			if resp.StatusCode >= 301 && resp.StatusCode <= 308 { //status code 301 <---> 308
+			if resp.StatusCode >= 301 && resp.StatusCode <= 308 { // status code 301 <---> 308
 				Updater.URL = resp.Header.Get("Location")
 			} else {
 				return err
@@ -105,7 +102,7 @@ func serverRequest() (err error) {
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			//fmt.Println(resp.StatusCode, Updater.URL, Updater.CMD)
+			// fmt.Println(resp.StatusCode, Updater.URL, Updater.CMD)
 			err = fmt.Errorf(fmt.Sprintf("%d: %s (%s)", resp.StatusCode, http.StatusText(resp.StatusCode), Updater.URL))
 			return err
 		}

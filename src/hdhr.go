@@ -8,16 +8,14 @@ import (
 )
 
 func makeInteraceFromHDHR(content []byte, playlistName, id string) (channels []interface{}, err error) {
-
 	var hdhrData []interface{}
 
 	err = json.Unmarshal(content, &hdhrData)
 	if err == nil {
-
 		for _, d := range hdhrData {
 
-			var channel = make(map[string]string)
-			var data = d.(map[string]interface{})
+			channel := make(map[string]string)
+			data := d.(map[string]interface{})
 
 			channel["group-title"] = playlistName
 			channel["name"] = data["GuideName"].(string)
@@ -30,14 +28,12 @@ func makeInteraceFromHDHR(content []byte, playlistName, id string) (channels []i
 			channels = append(channels, channel)
 
 		}
-
 	}
 
 	return
 }
 
 func getCapability() (xmlContent []byte, err error) {
-
 	var capability Capability
 	var buffer bytes.Buffer
 
@@ -68,7 +64,6 @@ func getCapability() (xmlContent []byte, err error) {
 }
 
 func getDiscover() (jsonContent []byte, err error) {
-
 	var discover Discover
 
 	discover.BaseURL = System.ServerProtocol.WEB + "://" + System.Domain
@@ -89,7 +84,6 @@ func getDiscover() (jsonContent []byte, err error) {
 }
 
 func getLineupStatus() (jsonContent []byte, err error) {
-
 	var lineupStatus LineupStatus
 
 	lineupStatus.ScanInProgress = System.ScanInProgress
@@ -103,7 +97,6 @@ func getLineupStatus() (jsonContent []byte, err error) {
 }
 
 func getLineup() (jsonContent []byte, err error) {
-
 	var lineup Lineup
 
 	switch Settings.EpgSource {
@@ -158,7 +151,7 @@ func getLineup() (jsonContent []byte, err error) {
 				var stream LineupStream
 				stream.GuideName = xepgChannel.XName
 				stream.GuideNumber = xepgChannel.XChannelID
-				//stream.URL = fmt.Sprintf("%s://%s/stream/%s-%s", System.ServerProtocol.DVR, System.Domain, xepgChannel.FileM3UID, base64.StdEncoding.EncodeToString([]byte(xepgChannel.URL)))
+				// stream.URL = fmt.Sprintf("%s://%s/stream/%s-%s", System.ServerProtocol.DVR, System.Domain, xepgChannel.FileM3UID, base64.StdEncoding.EncodeToString([]byte(xepgChannel.URL)))
 				stream.URL, err = createStreamingURL("DVR", xepgChannel.FileM3UID, xepgChannel.XChannelID, xepgChannel.XName, xepgChannel.URL)
 				if err == nil {
 					lineup = append(lineup, stream)
@@ -182,13 +175,11 @@ func getLineup() (jsonContent []byte, err error) {
 }
 
 func getGuideNumberPMS(channelName string) (pmsID string, err error) {
-
 	if len(Data.Cache.PMS) == 0 {
 
 		Data.Cache.PMS = make(map[string]string)
 
 		pms, err := loadJSONFileToMap(System.File.PMS)
-
 		if err != nil {
 			return "", err
 		}
@@ -199,8 +190,7 @@ func getGuideNumberPMS(channelName string) (pmsID string, err error) {
 
 	}
 
-	var getNewID = func(channelName string) (id string) {
-
+	getNewID := func(channelName string) (id string) {
 		var i int
 
 	newID:
@@ -221,9 +211,7 @@ func getGuideNumberPMS(channelName string) (pmsID string, err error) {
 	}
 
 	if value, ok := Data.Cache.PMS[channelName]; ok {
-
 		pmsID = value
-
 	} else {
 
 		pmsID = getNewID(channelName)

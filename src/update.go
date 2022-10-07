@@ -6,15 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 
 	up2date "xteve/src/internal/up2date/client"
-
-	"reflect"
 )
 
 // BinaryUpdate : Binary Update Prozess. Git Branch master und beta wird von GitHub geladen.
 func BinaryUpdate() (err error) {
-
 	if System.GitHub.Update == false {
 		showWarning(2099)
 		return
@@ -22,7 +20,7 @@ func BinaryUpdate() (err error) {
 
 	var debug string
 
-	var updater = &up2date.Updater
+	updater := &up2date.Updater
 	updater.Name = System.Update.Name
 	updater.Branch = System.Branch
 
@@ -33,8 +31,8 @@ func BinaryUpdate() (err error) {
 	// Update von GitHub
 	case "master", "beta":
 
-		var gitInfo = fmt.Sprintf("%s/%s/info.json?raw=true", System.Update.Git, System.Branch)
-		var zipFile = fmt.Sprintf("%s/%s/%s_%s_%s.zip?raw=true", System.Update.Git, System.Branch, System.AppName, System.OS, System.ARCH)
+		gitInfo := fmt.Sprintf("%s/%s/info.json?raw=true", System.Update.Git, System.Branch)
+		zipFile := fmt.Sprintf("%s/%s/%s_%s_%s.zip?raw=true", System.Update.Git, System.Branch, System.AppName, System.OS, System.ARCH)
 		var body []byte
 
 		var git GitStruct
@@ -103,11 +101,10 @@ func BinaryUpdate() (err error) {
 
 	}
 
-	var currentVersion = System.Version + "." + System.Build
+	currentVersion := System.Version + "." + System.Build
 
 	// Versionsnummer überprüfen
 	if updater.Response.Version > currentVersion && updater.Response.Status == true {
-
 		if Settings.XteveAutoUpdate == true {
 			// Update durchführen
 			var fileType, url string
@@ -153,14 +150,12 @@ func BinaryUpdate() (err error) {
 			// Hinweis ausgeben
 			showWarning(6004)
 		}
-
 	}
 
 	return nil
 }
 
 func conditionalUpdateChanges() (err error) {
-
 checkVersion:
 	settingsMap, err := loadJSONFileToMap(System.File.Settings)
 	if err != nil || len(settingsMap) == 0 {
@@ -193,7 +188,7 @@ checkVersion:
 
 			// Neuer Filter (WebUI). Alte Filtereinstellungen werden konvertiert
 			if oldFilter, ok := settingsMap["filter"].([]interface{}); ok {
-				var newFilterMap = convertToNewFilter(oldFilter)
+				newFilterMap := convertToNewFilter(oldFilter)
 				settingsMap["filter"] = newFilterMap
 
 				settingsMap["version"] = "2.0.0"
@@ -253,11 +248,9 @@ checkVersion:
 }
 
 func convertToNewFilter(oldFilter []interface{}) (newFilterMap map[int]interface{}) {
-
 	newFilterMap = make(map[int]interface{})
 
 	switch reflect.TypeOf(oldFilter).Kind() {
-
 	case reflect.Slice:
 		s := reflect.ValueOf(oldFilter)
 
@@ -273,30 +266,24 @@ func convertToNewFilter(oldFilter []interface{}) (newFilterMap map[int]interface
 			newFilterMap[i] = newFilter
 
 		}
-
 	}
 
 	return
 }
 
 func setValueForUUID() (err error) {
-
 	xepg, err := loadJSONFileToMap(System.File.XEPG)
 
 	for _, c := range xepg {
 
-		var xepgChannel = c.(map[string]interface{})
+		xepgChannel := c.(map[string]interface{})
 
 		if uuidKey, ok := xepgChannel["_uuid.key"].(string); ok {
-
 			if value, ok := xepgChannel[uuidKey].(string); ok {
-
 				if len(value) > 0 {
 					xepgChannel["_uuid.value"] = value
 				}
-
 			}
-
 		}
 
 	}

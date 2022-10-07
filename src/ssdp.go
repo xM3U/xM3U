@@ -1,72 +1,66 @@
 package src
 
 import (
-  "fmt"
-  "log"
-  "os"
-  "os/signal"
-  "time"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"time"
 
-  "github.com/koron/go-ssdp"
+	"github.com/koron/go-ssdp"
 )
 
 // SSDP : SSPD / DLNA Server
 func SSDP() (err error) {
+	if Settings.SSDP == false || System.Flag.Info == true {
+		return
+	}
 
-  if Settings.SSDP == false || System.Flag.Info == true {
-    return
-  }
+	showInfo(fmt.Sprintf("SSDP / DLNA:%t", Settings.SSDP))
 
-  showInfo(fmt.Sprintf("SSDP / DLNA:%t", Settings.SSDP))
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
 
-  quit := make(chan os.Signal, 1)
-  signal.Notify(quit, os.Interrupt)
+	ad, err := ssdp.Advertise(
+		fmt.Sprintf("upnp:rootdevice"),                           // send as "ST"
+		fmt.Sprintf("uuid:%s::upnp:rootdevice", System.DeviceID), // send as "USN"
+		fmt.Sprintf("%s/device.xml", System.URLBase),             // send as "LOCATION"
+		System.AppName, // send as "SERVER"
+		1800)           // send as "maxAge" in "CACHE-CONTROL"
+	if err != nil {
+		return
+	}
 
-  ad, err := ssdp.Advertise(
-    fmt.Sprintf("upnp:rootdevice"),                           // send as "ST"
-    fmt.Sprintf("uuid:%s::upnp:rootdevice", System.DeviceID), // send as "USN"
-    fmt.Sprintf("%s/device.xml", System.URLBase),             // send as "LOCATION"
-    System.AppName, // send as "SERVER"
-    1800)           // send as "maxAge" in "CACHE-CONTROL"
+	// Debug SSDP
+	if System.Flag.Debug == 3 {
+		ssdp.Logger = log.New(os.Stderr, "[SSDP] ", log.LstdFlags)
+	}
 
-  if err != nil {
-    return
-  }
+	go func(adv *ssdp.Advertiser) {
+		aliveTick := time.Tick(300 * time.Second)
 
-  // Debug SSDP
-  if System.Flag.Debug == 3 {
-    ssdp.Logger = log.New(os.Stderr, "[SSDP] ", log.LstdFlags)
-  }
+	loop:
+		for {
+			select {
 
-  go func(adv *ssdp.Advertiser) {
+			case <-aliveTick:
+				err = adv.Alive()
+				if err != nil {
+					ShowError(err, 0)
+					adv.Bye()
+					adv.Close()
+					break loop
+				}
 
-    aliveTick := time.Tick(300 * time.Second)
+			case <-quit:
+				adv.Bye()
+				adv.Close()
+				os.Exit(0)
+				break loop
 
-  loop:
-    for {
+			}
+		}
+	}(ad)
 
-      select {
-
-      case <-aliveTick:
-        err = adv.Alive()
-        if err != nil {
-          ShowError(err, 0)
-          adv.Bye()
-          adv.Close()
-          break loop
-        }
-
-      case <-quit:
-        adv.Bye()
-        adv.Close()
-        os.Exit(0)
-        break loop
-
-      }
-
-    }
-
-  }(ad)
-
-  return
+	return
 }

@@ -11,14 +11,13 @@ import (
 )
 
 func showInfo(str string) {
-
 	if System.Flag.Info == true {
 		return
 	}
 
-	var max = 23
-	var msg = strings.SplitN(str, ":", 2)
-	var length = len(msg[0])
+	max := 23
+	msg := strings.SplitN(str, ":", 2)
+	length := len(msg[0])
 	var space string
 
 	if len(msg) == 2 {
@@ -29,7 +28,7 @@ func showInfo(str string) {
 
 		msg[0] = msg[0] + ":" + space
 
-		var logMsg = fmt.Sprintf("[%s] %s%s", System.Name, msg[0], msg[1])
+		logMsg := fmt.Sprintf("[%s] %s%s", System.Name, msg[0], msg[1])
 
 		printLogOnScreen(logMsg, "info")
 
@@ -43,16 +42,15 @@ func showInfo(str string) {
 }
 
 func showDebug(str string, level int) {
-
 	if System.Flag.Debug < level {
 		return
 	}
 
-	var max = 23
-	var msg = strings.SplitN(str, ":", 2)
-	var length = len(msg[0])
+	max := 23
+	msg := strings.SplitN(str, ":", 2)
+	length := len(msg[0])
 	var space string
-	var mutex = sync.RWMutex{}
+	mutex := sync.RWMutex{}
 
 	if len(msg) == 2 {
 
@@ -61,7 +59,7 @@ func showDebug(str string, level int) {
 		}
 		msg[0] = msg[0] + ":" + space
 
-		var logMsg = fmt.Sprintf("[DEBUG] %s%s", msg[0], msg[1])
+		logMsg := fmt.Sprintf("[DEBUG] %s%s", msg[0], msg[1])
 
 		printLogOnScreen(logMsg, "debug")
 
@@ -77,10 +75,9 @@ func showDebug(str string, level int) {
 }
 
 func showHighlight(str string) {
-
-	var max = 23
-	var msg = strings.SplitN(str, ":", 2)
-	var length = len(msg[0])
+	max := 23
+	msg := strings.SplitN(str, ":", 2)
+	length := len(msg[0])
 	var space string
 
 	var notification Notification
@@ -94,7 +91,7 @@ func showHighlight(str string) {
 
 		msg[0] = msg[0] + ":" + space
 
-		var logMsg = fmt.Sprintf("[%s] %s%s", System.Name, msg[0], msg[1])
+		logMsg := fmt.Sprintf("[%s] %s%s", System.Name, msg[0], msg[1])
 
 		printLogOnScreen(logMsg, "highlight")
 
@@ -109,10 +106,9 @@ func showHighlight(str string) {
 }
 
 func showWarning(errCode int) {
-
-	var errMsg = getErrMsg(errCode)
-	var logMsg = fmt.Sprintf("[%s] [WARNING] %s", System.Name, errMsg)
-	var mutex = sync.RWMutex{}
+	errMsg := getErrMsg(errCode)
+	logMsg := fmt.Sprintf("[%s] [WARNING] %s", System.Name, errMsg)
+	mutex := sync.RWMutex{}
 
 	printLogOnScreen(logMsg, "warning")
 
@@ -126,11 +122,10 @@ func showWarning(errCode int) {
 
 // ShowError : Zeigt die Fehlermeldungen in der Konsole
 func ShowError(err error, errCode int) {
+	mutex := sync.RWMutex{}
 
-	var mutex = sync.RWMutex{}
-
-	var errMsg = getErrMsg(errCode)
-	var logMsg = fmt.Sprintf("[%s] [ERROR] %s (%s) - EC: %d", System.Name, err, errMsg, errCode)
+	errMsg := getErrMsg(errCode)
+	logMsg := fmt.Sprintf("[%s] [ERROR] %s (%s) - EC: %d", System.Name, err, errMsg, errCode)
 
 	printLogOnScreen(logMsg, "error")
 
@@ -143,7 +138,6 @@ func ShowError(err error, errCode int) {
 }
 
 func printLogOnScreen(logMsg string, logType string) {
-
 	var color string
 
 	switch logType {
@@ -176,20 +170,18 @@ func printLogOnScreen(logMsg string, logType string) {
 		fmt.Print("\033[0m")
 
 	}
-
 }
 
 func logCleanUp() {
-
-	var logEntriesRAM = Settings.LogEntriesRAM
-	var logs = WebScreenLog.Log
+	logEntriesRAM := Settings.LogEntriesRAM
+	logs := WebScreenLog.Log
 
 	WebScreenLog.Warnings = 0
 	WebScreenLog.Errors = 0
 
 	if len(logs) > logEntriesRAM {
 
-		var tmp = make([]string, 0)
+		tmp := make([]string, 0)
 		for i := len(logs) - logEntriesRAM; i < logEntriesRAM; i++ {
 			tmp = append(tmp, logs[i])
 		}
@@ -216,7 +208,6 @@ func logCleanUp() {
 
 // Fehlercodes
 func getErrMsg(errCode int) (errMsg string) {
-
 	switch errCode {
 
 	case 0:
@@ -393,9 +384,8 @@ func getErrMsg(errCode int) (errMsg string) {
 }
 
 func addNotification(notification Notification) (err error) {
-
 	var i int
-	var t = time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
+	t := time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 	notification.Time = strconv.FormatInt(t, 10)
 	notification.New = true
 

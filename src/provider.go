@@ -13,15 +13,13 @@ import (
 
 // fileType: Welcher Dateityp soll aktualisiert werden (m3u, hdhr, xml) | fileID: Update einer bestimmten Datei (Provider ID)
 func getProviderData(fileType, fileID string) (err error) {
-
 	var fileExtension, serverFileName string
-	var body = make([]byte, 0)
-	var newProvider = false
-	var dataMap = make(map[string]interface{})
+	body := make([]byte, 0)
+	newProvider := false
+	dataMap := make(map[string]interface{})
 
-	var saveDateFromProvider = func(fileSource, serverFileName, id string, body []byte) (err error) {
-
-		var data = make(map[string]interface{})
+	saveDateFromProvider := func(fileSource, serverFileName, id string, body []byte) (err error) {
+		data := make(map[string]interface{})
 
 		if value, ok := dataMap[id].(map[string]interface{}); ok {
 			data = value
@@ -31,12 +29,10 @@ func getProviderData(fileType, fileID string) (err error) {
 		}
 
 		// Default keys für die Providerdaten
-		var keys = []string{"name", "description", "type", "file." + System.AppName, "file.source", "tuner", "last.update", "compatibility", "counter.error", "counter.download", "provider.availability"}
+		keys := []string{"name", "description", "type", "file." + System.AppName, "file.source", "tuner", "last.update", "compatibility", "counter.error", "counter.download", "provider.availability"}
 
 		for _, key := range keys {
-
 			if _, ok := data[key]; !ok {
-
 				switch key {
 
 				case "name":
@@ -76,9 +72,7 @@ func getProviderData(fileType, fileID string) (err error) {
 				case "provider.availability":
 					data[key] = 100
 				}
-
 			}
-
 		}
 
 		if _, ok := data["id.provider"]; !ok {
@@ -88,7 +82,7 @@ func getProviderData(fileType, fileID string) (err error) {
 		// Datei extrahieren
 		body, err = extractGZIP(body, fileSource)
 		if err != nil {
-			ShowError(err, 000)
+			ShowError(err, 0o00)
 			return
 		}
 
@@ -111,7 +105,7 @@ func getProviderData(fileType, fileID string) (err error) {
 			return
 		}
 
-		var filePath = System.Folder.Data + data["file."+System.AppName].(string)
+		filePath := System.Folder.Data + data["file."+System.AppName].(string)
 
 		err = writeByteToFile(filePath, body)
 
@@ -121,7 +115,6 @@ func getProviderData(fileType, fileID string) (err error) {
 		}
 
 		return
-
 	}
 
 	switch fileType {
@@ -142,8 +135,8 @@ func getProviderData(fileType, fileID string) (err error) {
 
 	for dataID, d := range dataMap {
 
-		var data = d.(map[string]interface{})
-		var fileSource = data["file.source"].(string)
+		data := d.(map[string]interface{})
+		fileSource := data["file.source"].(string)
 		newProvider = false
 
 		if _, ok := data["new"]; ok {
@@ -164,7 +157,7 @@ func getProviderData(fileType, fileID string) (err error) {
 
 			// Laden vom HDHomeRun Tuner
 			showInfo("Tuner:" + fileSource)
-			var tunerURL = "http://" + fileSource + "/lineup.json"
+			tunerURL := "http://" + fileSource + "/lineup.json"
 			serverFileName, body, err = downloadFileFromServer(tunerURL)
 
 		default:
@@ -201,13 +194,13 @@ func getProviderData(fileType, fileID string) (err error) {
 
 		if err != nil {
 
-			ShowError(err, 000)
-			var downloadErr = err
+			ShowError(err, 0o00)
+			downloadErr := err
 
 			if newProvider == false {
 
 				// Prüfen ob ältere Datei vorhanden ist
-				var file = System.Folder.Data + dataID + fileExtension
+				file := System.Folder.Data + dataID + fileExtension
 
 				err = checkFile(file)
 				if err == nil {
@@ -220,7 +213,7 @@ func getProviderData(fileType, fileID string) (err error) {
 				}
 
 				// Fehler Counter um 1 erhöhen
-				var data = make(map[string]interface{})
+				data := make(map[string]interface{})
 				if value, ok := dataMap[dataID].(map[string]interface{}); ok {
 
 					data = value
@@ -237,10 +230,9 @@ func getProviderData(fileType, fileID string) (err error) {
 
 		// Berechnen der Fehlerquote
 		if newProvider == false {
-
 			if value, ok := dataMap[dataID].(map[string]interface{}); ok {
 
-				var data = make(map[string]interface{})
+				data := make(map[string]interface{})
 				data = value
 
 				if data["counter.error"].(float64) == 0 {
@@ -250,7 +242,6 @@ func getProviderData(fileType, fileID string) (err error) {
 				}
 
 			}
-
 		}
 
 		switch fileType {
@@ -276,7 +267,6 @@ func getProviderData(fileType, fileID string) (err error) {
 }
 
 func downloadFileFromServer(providerURL string) (filename string, body []byte, err error) {
-
 	_, err = url.ParseRequestURI(providerURL)
 	if err != nil {
 		return
@@ -295,13 +285,13 @@ func downloadFileFromServer(providerURL string) (filename string, body []byte, e
 	}
 
 	// Dateiname aus dem Header holen
-	var index = strings.Index(resp.Header.Get("Content-Disposition"), "filename")
+	index := strings.Index(resp.Header.Get("Content-Disposition"), "filename")
 
 	if index > -1 {
 
-		var headerFilename = resp.Header.Get("Content-Disposition")[index:len(resp.Header.Get("Content-Disposition"))]
-		var value = strings.Split(headerFilename, `=`)
-		var f = strings.Replace(value[1], `"`, "", -1)
+		headerFilename := resp.Header.Get("Content-Disposition")[index:len(resp.Header.Get("Content-Disposition"))]
+		value := strings.Split(headerFilename, `=`)
+		f := strings.Replace(value[1], `"`, "", -1)
 
 		f = strings.Replace(f, `;`, "", -1)
 		filename = f
@@ -309,7 +299,7 @@ func downloadFileFromServer(providerURL string) (filename string, body []byte, e
 
 	} else {
 
-		var cleanFilename = strings.SplitN(getFilenameFromPath(providerURL), "?", 2)
+		cleanFilename := strings.SplitN(getFilenameFromPath(providerURL), "?", 2)
 		filename = cleanFilename[0]
 
 	}

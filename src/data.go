@@ -17,18 +17,16 @@ import (
 
 // Einstellungen ändern (WebUI)
 func updateServerSettings(request RequestStruct) (settings SettingsStruct, err error) {
-
-	var oldSettings = jsonToMap(mapToJSON(Settings))
-	var newSettings = jsonToMap(mapToJSON(request.Settings))
-	var reloadData = false
-	var cacheImages = false
-	var createXEPGFiles = false
+	oldSettings := jsonToMap(mapToJSON(Settings))
+	newSettings := jsonToMap(mapToJSON(request.Settings))
+	reloadData := false
+	cacheImages := false
+	createXEPGFiles := false
 	var debug string
 
 	// -vvv [URL] --sout '#transcode{vcodec=mp4v, acodec=mpga} :standard{access=http, mux=ogg}'
 
 	for key, value := range newSettings {
-
 		if _, ok := oldSettings[key]; ok {
 
 			switch key {
@@ -41,7 +39,7 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 
 			case "update":
 				// Leerzeichen aus den Werten entfernen und Formatierung der Uhrzeit überprüfen (0000 - 2359)
-				var newUpdateTimes = make([]string, 0)
+				newUpdateTimes := make([]string, 0)
 
 				for _, v := range value.([]interface{}) {
 
@@ -58,7 +56,7 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 				}
 
 				if len(newUpdateTimes) == 0 {
-					//newUpdateTimes = append(newUpdateTimes, "0000")
+					// newUpdateTimes = append(newUpdateTimes, "0000")
 				}
 
 				value = newUpdateTimes
@@ -102,7 +100,7 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 				}
 
 			case "ffmpeg.path", "vlc.path":
-				var path = value.(string)
+				path := value.(string)
 				if len(path) > 0 {
 
 					err = checkFile(path)
@@ -140,7 +138,6 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 			showDebug(debug, 1)
 
 		}
-
 	}
 
 	// Einstellungen aktualisieren
@@ -203,7 +200,6 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 		}
 
 		if cacheImages == true {
-
 			if Settings.EpgSource == "XEPG" && System.ImageCachingInProgress == 0 {
 
 				Data.Cache.Images, err = imgcache.New(System.Folder.ImagesCache, fmt.Sprintf("%s://%s/images/", System.ServerProtocol.WEB, System.Domain), Settings.CacheImages)
@@ -219,7 +215,6 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 
 				case true:
 					go func() {
-
 						createXMLTVFile()
 						createM3UFile()
 
@@ -232,22 +227,18 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 						System.ImageCachingInProgress = 0
 
 						buildXEPG(false)
-
 					}()
 
 				}
 
 			}
-
 		}
 
 		if createXEPGFiles == true {
-
 			go func() {
 				createXMLTVFile()
 				createM3UFile()
 			}()
-
 		}
 
 	}
@@ -257,11 +248,10 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 
 // Providerdaten speichern (WebUI)
 func saveFiles(request RequestStruct, fileType string) (err error) {
-
-	var filesMap = make(map[string]interface{})
-	var newData = make(map[string]interface{})
+	filesMap := make(map[string]interface{})
+	newData := make(map[string]interface{})
 	var indicator string
-	var reloadData = false
+	reloadData := false
 
 	switch fileType {
 	case "m3u":
@@ -294,15 +284,13 @@ func saveFiles(request RequestStruct, fileType string) (err error) {
 			filesMap[dataID] = data
 
 		} else {
-
 			// Bereits vorhandene Providerdatei
 			for key, value := range data.(map[string]interface{}) {
 
-				var oldData = filesMap[dataID].(map[string]interface{})
+				oldData := filesMap[dataID].(map[string]interface{})
 				oldData[key] = value
 
 			}
-
 		}
 
 		switch fileType {
@@ -364,8 +352,7 @@ func saveFiles(request RequestStruct, fileType string) (err error) {
 
 // Providerdaten manuell aktualisieren (WebUI)
 func updateFile(request RequestStruct, fileType string) (err error) {
-
-	var updateData = make(map[string]interface{})
+	updateData := make(map[string]interface{})
 
 	switch fileType {
 
@@ -394,8 +381,7 @@ func updateFile(request RequestStruct, fileType string) (err error) {
 
 // Providerdaten löschen (WebUI)
 func deleteLocalProviderFiles(dataID, fileType string) {
-
-	var removeData = make(map[string]interface{})
+	removeData := make(map[string]interface{})
 	var fileExtension string
 
 	switch fileType {
@@ -423,11 +409,10 @@ func deleteLocalProviderFiles(dataID, fileType string) {
 
 // Filtereinstellungen speichern (WebUI)
 func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
-
-	var filterMap = make(map[int64]interface{})
-	var newData = make(map[int64]interface{})
+	filterMap := make(map[int64]interface{})
+	newData := make(map[int64]interface{})
 	var defaultFilter FilterStruct
-	var newFilter = false
+	newFilter := false
 
 	defaultFilter.Active = true
 	defaultFilter.CaseSensitive = false
@@ -435,8 +420,7 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 	filterMap = Settings.Filter
 	newData = request.Filter
 
-	var createNewID = func() (id int64) {
-
+	createNewID := func() (id int64) {
 	newID:
 		if _, ok := filterMap[id]; ok {
 			id++
@@ -467,7 +451,6 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 			}
 
 			if filter, ok := data.(map[string]interface{})["filter"].(string); ok {
-
 				if len(filter) == 0 {
 
 					err = errors.New(getErrMsg(1014))
@@ -477,7 +460,6 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 
 					return
 				}
-
 			}
 
 			if oldData, ok := filterMap[dataID].(map[string]interface{}); ok {
@@ -507,8 +489,7 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 
 // XEPG Mapping speichern
 func saveXEpgMapping(request RequestStruct) (err error) {
-
-	var tmp = Data.XEPG
+	tmp := Data.XEPG
 
 	Data.Cache.Images, err = imgcache.New(System.Folder.ImagesCache, fmt.Sprintf("%s://%s/images/", System.ServerProtocol.WEB, System.Domain), Settings.CacheImages)
 	if err != nil {
@@ -535,10 +516,8 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 		buildXEPG(true)
 
 	} else {
-
 		// Wenn während des erstellen der Datanbank das Mapping erneut gespeichert wird, wird die Datenbank erst später erneut aktualisiert.
 		go func() {
-
 			if System.BackgroundProcess == true {
 				return
 			}
@@ -560,9 +539,7 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 			showInfo("XEPG:" + fmt.Sprintf("Ready to use"))
 
 			System.BackgroundProcess = false
-
 		}()
-
 	}
 
 	return
@@ -570,11 +547,9 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 
 // Benutzerdaten speichern (WebUI)
 func saveUserData(request RequestStruct) (err error) {
+	userData := request.UserData
 
-	var userData = request.UserData
-
-	var newCredentials = func(userID string, newUserData map[string]interface{}) (err error) {
-
+	newCredentials := func(userID string, newUserData map[string]interface{}) (err error) {
 		var newUsername, newPassword string
 		if username, ok := newUserData["username"].(string); ok {
 			newUsername = username
@@ -607,9 +582,7 @@ func saveUserData(request RequestStruct) (err error) {
 		delete(newUserData.(map[string]interface{}), "confirm")
 
 		if _, ok := newUserData.(map[string]interface{})["delete"]; ok {
-
 			authentication.RemoveUser(userID)
-
 		} else {
 
 			err = authentication.WriteUserData(userID, newUserData.(map[string]interface{}))
@@ -626,10 +599,9 @@ func saveUserData(request RequestStruct) (err error) {
 
 // Neuen Benutzer anlegen (WebUI)
 func saveNewUser(request RequestStruct) (err error) {
-
-	var data = request.UserData
-	var username = data["username"].(string)
-	var password = data["password"].(string)
+	data := request.UserData
+	username := data["username"].(string)
+	password := data["password"].(string)
 
 	delete(data, "password")
 	delete(data, "confirm")
@@ -645,11 +617,9 @@ func saveNewUser(request RequestStruct) (err error) {
 
 // Wizard (WebUI)
 func saveWizard(request RequestStruct) (nextStep int, err error) {
-
-	var wizard = jsonToMap(mapToJSON(request.Wizard))
+	wizard := jsonToMap(mapToJSON(request.Wizard))
 
 	for key, value := range wizard {
-
 		switch key {
 
 		case "tuner":
@@ -662,8 +632,8 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 
 		case "m3u", "xmltv":
 
-			var filesMap = make(map[string]interface{})
-			var data = make(map[string]interface{})
+			filesMap := make(map[string]interface{})
+			data := make(map[string]interface{})
 			var indicator, dataID string
 
 			filesMap = make(map[string]interface{})
@@ -698,14 +668,14 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 				err = getProviderData(key, dataID)
 
 				if err != nil {
-					ShowError(err, 000)
+					ShowError(err, 0o00)
 					delete(filesMap, dataID)
 					return
 				}
 
 				err = buildDatabaseDVR()
 				if err != nil {
-					ShowError(err, 000)
+					ShowError(err, 0o00)
 					delete(filesMap, dataID)
 					return
 				}
@@ -722,7 +692,7 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 
 				if err != nil {
 
-					ShowError(err, 000)
+					ShowError(err, 0o00)
 					delete(filesMap, dataID)
 					return
 
@@ -734,7 +704,6 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 			}
 
 		}
-
 	}
 
 	err = saveSettings(Settings)
@@ -747,7 +716,6 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 
 // Filterregeln erstellen
 func createFilterRules() (err error) {
-
 	Data.Filter = nil
 	var dataFilter Filter
 
@@ -794,7 +762,6 @@ func createFilterRules() (err error) {
 
 // Datenbank für das DVR System erstellen
 func buildDatabaseDVR() (err error) {
-
 	System.ScanInProgress = 1
 
 	Data.Streams.All = make([]interface{}, 0, System.UnfilteredChannelLimit)
@@ -805,9 +772,9 @@ func buildDatabaseDVR() (err error) {
 	Data.StreamPreviewUI.Active = []string{}
 	Data.StreamPreviewUI.Inactive = []string{}
 
-	var availableFileTypes = []string{"m3u", "hdhr"}
+	availableFileTypes := []string{"m3u", "hdhr"}
 
-	var tmpGroupsM3U = make(map[string]int64)
+	tmpGroupsM3U := make(map[string]int64)
 
 	err = createFilterRules()
 	if err != nil {
@@ -816,17 +783,17 @@ func buildDatabaseDVR() (err error) {
 
 	for _, fileType := range availableFileTypes {
 
-		var playlistFile = getLocalProviderFiles(fileType)
+		playlistFile := getLocalProviderFiles(fileType)
 
 		for n, i := range playlistFile {
 
 			var channels []interface{}
 			var groupTitle, tvgID, uuid int = 0, 0, 0
-			var keys = []string{"group-title", "tvg-id", "uuid"}
-			var compatibility = make(map[string]int)
+			keys := []string{"group-title", "tvg-id", "uuid"}
+			compatibility := make(map[string]int)
 
-			var id = strings.TrimSuffix(getFilenameFromPath(i), path.Ext(getFilenameFromPath(i)))
-			var playlistName = getProviderParameter(id, fileType, "name")
+			id := strings.TrimSuffix(getFilenameFromPath(i), path.Ext(getFilenameFromPath(i)))
+			playlistName := getProviderParameter(id, fileType, "name")
 
 			switch fileType {
 
@@ -847,14 +814,13 @@ func buildDatabaseDVR() (err error) {
 			// Streams analysieren
 			for _, stream := range channels {
 
-				var s = stream.(map[string]string)
+				s := stream.(map[string]string)
 				s["_file.m3u.path"] = i
 				s["_file.m3u.name"] = playlistName
 				s["_file.m3u.id"] = id
 
 				// Kompatibilität berechnen
 				for _, key := range keys {
-
 					switch key {
 					case "uuid":
 						if value, ok := s["_uuid.key"]; ok {
@@ -885,14 +851,13 @@ func buildDatabaseDVR() (err error) {
 						}
 
 					}
-
 				}
 
 				Data.Streams.All = append(Data.Streams.All, stream)
 
 				// Neuer Filter ab Version 1.3.0
 				var preview string
-				var status = filterThisStream(stream)
+				status := filterThisStream(stream)
 
 				if name, ok := s["name"]; ok {
 					var group string
@@ -946,8 +911,8 @@ func buildDatabaseDVR() (err error) {
 	}
 
 	for group, count := range tmpGroupsM3U {
-		var text = fmt.Sprintf("%s (%d)", group, count)
-		var value = fmt.Sprintf("%s", group)
+		text := fmt.Sprintf("%s (%d)", group, count)
+		value := fmt.Sprintf("%s", group)
 		Data.Playlist.M3U.Groups.Text = append(Data.Playlist.M3U.Groups.Text, text)
 		Data.Playlist.M3U.Groups.Value = append(Data.Playlist.M3U.Groups.Value, value)
 	}
@@ -985,9 +950,8 @@ func buildDatabaseDVR() (err error) {
 
 // Speicherort aller lokalen Providerdateien laden, immer für eine Dateityp (M3U, XMLTV usw.)
 func getLocalProviderFiles(fileType string) (localFiles []string) {
-
 	var fileExtension string
-	var dataMap = make(map[string]interface{})
+	dataMap := make(map[string]interface{})
 
 	switch fileType {
 
@@ -1014,8 +978,7 @@ func getLocalProviderFiles(fileType string) (localFiles []string) {
 
 // Providerparameter anhand von dem Key ausgeben
 func getProviderParameter(id, fileType, key string) (s string) {
-
-	var dataMap = make(map[string]interface{})
+	dataMap := make(map[string]interface{})
 
 	switch fileType {
 	case "m3u":
@@ -1045,8 +1008,7 @@ func getProviderParameter(id, fileType, key string) (s string) {
 
 // Provider Statistiken Kompatibilität aktualisieren
 func setProviderCompatibility(id, fileType string, compatibility map[string]int) {
-
-	var dataMap = make(map[string]interface{})
+	dataMap := make(map[string]interface{})
 
 	switch fileType {
 	case "m3u":
@@ -1075,5 +1037,4 @@ func setProviderCompatibility(id, fileType string, compatibility map[string]int)
 		saveSettings(Settings)
 
 	}
-
 }

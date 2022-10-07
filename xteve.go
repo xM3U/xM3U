@@ -47,28 +47,33 @@ const DBVersion = "2.1.0"
 // APIVersion : API Version
 const APIVersion = "1.1.0"
 
-var homeDirectory = fmt.Sprintf("%s%s.%s%s", src.GetUserHomeDirectory(), string(os.PathSeparator), strings.ToLower(Name), string(os.PathSeparator))
-var samplePath = fmt.Sprintf("%spath%sto%sxteve%s", string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator))
-var sampleRestore = fmt.Sprintf("%spath%sto%sfile%s", string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator))
+var (
+	homeDirectory = fmt.Sprintf("%s%s.%s%s", src.GetUserHomeDirectory(), string(os.PathSeparator), strings.ToLower(Name), string(os.PathSeparator))
+	samplePath    = fmt.Sprintf("%spath%sto%sxteve%s", string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator))
+	sampleRestore = fmt.Sprintf("%spath%sto%sfile%s", string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator), string(os.PathSeparator))
+)
 
-var configFolder = flag.String("config", "", ": Config Folder        ["+samplePath+"] (default: "+homeDirectory+")")
-var port = flag.String("port", "", ": Server port          [34400] (default: 34400)")
-var restore = flag.String("restore", "", ": Restore from backup  ["+sampleRestore+"xteve_backup.zip]")
+var (
+	configFolder = flag.String("config", "", ": Config Folder        ["+samplePath+"] (default: "+homeDirectory+")")
+	port         = flag.String("port", "", ": Server port          [34400] (default: 34400)")
+	restore      = flag.String("restore", "", ": Restore from backup  ["+sampleRestore+"xteve_backup.zip]")
+)
 
-var gitBranch = flag.String("branch", "", ": Git Branch           [master|beta] (default: master)")
-var debug = flag.Int("debug", 0, ": Debug level          [0 - 3] (default: 0)")
-var info = flag.Bool("info", false, ": Show system info")
-var h = flag.Bool("h", false, ": Show help")
+var (
+	gitBranch = flag.String("branch", "", ": Git Branch           [master|beta] (default: master)")
+	debug     = flag.Int("debug", 0, ": Debug level          [0 - 3] (default: 0)")
+	info      = flag.Bool("info", false, ": Show system info")
+	h         = flag.Bool("h", false, ": Show help")
+)
 
 // Aktiviert den Entwicklungsmodus. Für den Webserver werden dann die lokalen Dateien verwendet.
 var dev = flag.Bool("dev", false, ": Activates the developer mode, the source code must be available. The local files for the web interface are used.")
 
 func main() {
-
 	// Build-Nummer von der Versionsnummer trennen
-	var build = strings.Split(Version, ".")
+	build := strings.Split(Version, ".")
 
-	var system = &src.System
+	system := &src.System
 	system.APIVersion = APIVersion
 	system.Branch = GitHub.Branch
 	system.Build = build[len(build)-1:][0]
@@ -79,7 +84,6 @@ func main() {
 
 	// Panic !!!
 	defer func() {
-
 		if r := recover(); r != nil {
 
 			fmt.Println()
@@ -93,7 +97,6 @@ func main() {
 			runtime.Callers(2, pc)
 
 			for i := range pc {
-
 				if runtime.FuncForPC(pc[i]) != nil {
 
 					f := runtime.FuncForPC(pc[i])
@@ -104,14 +107,12 @@ func main() {
 					}
 
 				}
-
 			}
 
 			fmt.Println()
 			fmt.Println("* * * * * * * * * * * * * * * *")
 
 		}
-
 	}()
 
 	flag.Parse()
@@ -209,5 +210,4 @@ func main() {
 		src.ShowError(err, 0)
 		os.Exit(0)
 	}
-
 }

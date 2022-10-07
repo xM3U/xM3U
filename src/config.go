@@ -34,7 +34,6 @@ var Lock = sync.RWMutex{}
 
 // Init : Systeminitialisierung
 func Init() (err error) {
-
 	var debug string
 
 	// System Einstellungen
@@ -58,12 +57,12 @@ func Init() (err error) {
 	Settings.LogEntriesRAM = 500
 
 	// Variablen für den Update Prozess
-	//System.Update.Git = "https://github.com/xteve-project/xTeVe-Downloads/blob"
+	// System.Update.Git = "https://github.com/xteve-project/xTeVe-Downloads/blob"
 	System.Update.Git = fmt.Sprintf("https://github.com/%s/%s/blob", System.GitHub.User, System.GitHub.Repo)
 	System.Update.Name = "xteve_2"
 
 	// Ordnerpfade festlegen
-	var tempFolder = os.TempDir() + string(os.PathSeparator) + System.AppName + string(os.PathSeparator)
+	tempFolder := os.TempDir() + string(os.PathSeparator) + System.AppName + string(os.PathSeparator)
 	tempFolder = getPlatformPath(strings.Replace(tempFolder, "//", "/", -1))
 
 	if len(System.Folder.Config) == 0 {
@@ -162,7 +161,7 @@ func Init() (err error) {
 	}
 
 	// Separaten tmp Ordner für jede Instanz
-	//System.Folder.Temp = System.Folder.Temp + Settings.UUID + string(os.PathSeparator)
+	// System.Folder.Temp = System.Folder.Temp + Settings.UUID + string(os.PathSeparator)
 	showInfo(fmt.Sprintf("Temporary Folder:%s", getPlatformPath(System.Folder.Temp)))
 
 	err = checkFolder(System.Folder.Temp)
@@ -219,7 +218,6 @@ func Init() (err error) {
 
 // StartSystem : System wird gestartet
 func StartSystem(updateProviderFiles bool) (err error) {
-
 	setDeviceID()
 
 	if System.ScanInProgress == 1 {

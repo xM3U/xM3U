@@ -17,8 +17,7 @@ import (
 
 // StartWebserver : Startet den Webserver
 func StartWebserver() (err error) {
-
-	var port = Settings.Port
+	port := Settings.Port
 
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/stream/", Stream)
@@ -31,11 +30,11 @@ func StartWebserver() (err error) {
 	http.HandleFunc("/images/", Images)
 	http.HandleFunc("/data_images/", DataImages)
 
-	//http.HandleFunc("/auto/", Auto)
+	// http.HandleFunc("/auto/", Auto)
 
 	showInfo("DVR IP:" + System.IPAddress + ":" + Settings.Port)
 
-	var ips = len(System.IPAddressesV4) + len(System.IPAddressesV6) - 1
+	ips := len(System.IPAddressesV4) + len(System.IPAddressesV6) - 1
 	switch ips {
 
 	case 0:
@@ -59,10 +58,9 @@ func StartWebserver() (err error) {
 
 // Index : Web Server /
 func Index(w http.ResponseWriter, r *http.Request) {
-
 	var err error
 	var response []byte
-	var path = r.URL.Path
+	path := r.URL.Path
 	var debug string
 
 	setGlobalDomain(r.Host)
@@ -85,7 +83,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 			_, err := basicAuth(r, "authentication.pms")
 			if err != nil {
-				ShowError(err, 000)
+				ShowError(err, 0o00)
 				httpStatusError(w, r, 403)
 				return
 			}
@@ -119,9 +117,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 // Stream : Web Server /stream/
 func Stream(w http.ResponseWriter, r *http.Request) {
-
-	var path = strings.Replace(r.RequestURI, "/stream/", "", 1)
-	//var stream = strings.SplitN(path, "-", 2)
+	path := strings.Replace(r.RequestURI, "/stream/", "", 1)
+	// var stream = strings.SplitN(path, "-", 2)
 
 	streamInfo, err := getStreamInfo(path)
 	if err != nil {
@@ -187,8 +184,7 @@ func Stream(w http.ResponseWriter, r *http.Request) {
 
 // Auto : HDHR routing (wird derzeit nicht benutzt)
 func Auto(w http.ResponseWriter, r *http.Request) {
-
-	var channelID = strings.Replace(r.RequestURI, "/auto/v", "", 1)
+	channelID := strings.Replace(r.RequestURI, "/auto/v", "", 1)
 	fmt.Println(channelID)
 
 	/*
@@ -212,11 +208,10 @@ func Auto(w http.ResponseWriter, r *http.Request) {
 
 // xTeVe : Web Server /xmltv/ und /m3u/
 func xTeVe(w http.ResponseWriter, r *http.Request) {
-
 	var requestType, groupTitle, file, content, contentType string
 	var err error
-	var path = strings.TrimPrefix(r.URL.Path, "/")
-	var groups = []string{}
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	groups := []string{}
 
 	setGlobalDomain(r.Host)
 
@@ -253,7 +248,7 @@ func xTeVe(w http.ResponseWriter, r *http.Request) {
 
 		content, err = buildM3U(groups)
 		if err != nil {
-			ShowError(err, 000)
+			ShowError(err, 0o00)
 		}
 
 	}
@@ -261,7 +256,7 @@ func xTeVe(w http.ResponseWriter, r *http.Request) {
 	// Authentifizierung überprüfen
 	err = urlAuth(r, requestType)
 	if err != nil {
-		ShowError(err, 000)
+		ShowError(err, 0o00)
 		httpStatusError(w, r, 403)
 		return
 	}
@@ -282,9 +277,8 @@ func xTeVe(w http.ResponseWriter, r *http.Request) {
 
 // Images : Image Cache /images/
 func Images(w http.ResponseWriter, r *http.Request) {
-
-	var path = strings.TrimPrefix(r.URL.Path, "/")
-	var filePath = System.Folder.ImagesCache + getFilenameFromPath(path)
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	filePath := System.Folder.ImagesCache + getFilenameFromPath(path)
 
 	content, err := readByteFromFile(filePath)
 	if err != nil {
@@ -302,9 +296,8 @@ func Images(w http.ResponseWriter, r *http.Request) {
 
 // DataImages : Image Pfad für Logos / Bilder die hochgeladen wurden /data_images/
 func DataImages(w http.ResponseWriter, r *http.Request) {
-
-	var path = strings.TrimPrefix(r.URL.Path, "/")
-	var filePath = System.Folder.ImagesUpload + getFilenameFromPath(path)
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	filePath := System.Folder.ImagesUpload + getFilenameFromPath(path)
 
 	content, err := readByteFromFile(filePath)
 	if err != nil {
@@ -322,7 +315,6 @@ func DataImages(w http.ResponseWriter, r *http.Request) {
 
 // WS : Web Sockets /ws/
 func WS(w http.ResponseWriter, r *http.Request) {
-
 	var request RequestStruct
 	var response ResponseStruct
 	response.Status = true
@@ -354,9 +346,7 @@ func WS(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if System.ConfigurationWizard == false {
-
 			switch Settings.AuthenticationWEB {
-
 			// Token Authentication
 			case true:
 
@@ -386,15 +376,13 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 				response.Token = newToken
 				response.Users, _ = authentication.GetAllUserData()
-
 			}
-
 		}
 
 		switch request.Cmd {
 		// Daten lesen
 		case "getServerConfig":
-			//response.Config = Settings
+			// response.Config = Settings
 
 		case "updateLog":
 			response = setDefaultResponseData(response, false)
@@ -407,11 +395,11 @@ func WS(w http.ResponseWriter, r *http.Request) {
 			return
 
 		case "loadFiles":
-			//response.Response = Settings.Files
+			// response.Response = Settings.Files
 
 		// Daten schreiben
 		case "saveSettings":
-			var authenticationUpdate = Settings.AuthenticationWEB
+			authenticationUpdate := Settings.AuthenticationWEB
 			response.Settings, err = updateServerSettings(request)
 			if err == nil {
 
@@ -502,7 +490,7 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 				newWebURL, err := xteveRestoreFromWeb(request.Base64)
 				if err != nil {
-					ShowError(err, 000)
+					ShowError(err, 0o00)
 					response.Alert = err.Error()
 				}
 
@@ -524,13 +512,11 @@ func WS(w http.ResponseWriter, r *http.Request) {
 				response.LogoURL, err = uploadLogo(request.Base64, request.Filename)
 
 				if err == nil {
-
 					if err = conn.WriteJSON(response); err != nil {
 						ShowError(err, 1022)
 					} else {
 						return
 					}
-
 				}
 
 			}
@@ -540,14 +526,12 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 			err = errNew
 			if err == nil {
-
 				if nextStep == 10 {
 					System.ConfigurationWizard = false
 					response.Reload = true
 				} else {
 					response.Wizard = nextStep
 				}
-
 			}
 
 			/*
@@ -558,7 +542,7 @@ func WS(w http.ResponseWriter, r *http.Request) {
 		default:
 			fmt.Println("+ + + + + + + + + + +", request.Cmd)
 
-			var requestMap = make(map[string]interface{}) // Debug
+			requestMap := make(map[string]interface{}) // Debug
 			_ = requestMap
 			if System.Dev == true {
 				fmt.Println(mapToJSON(requestMap))
@@ -590,11 +574,10 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 // Web : Web Server /web/
 func Web(w http.ResponseWriter, r *http.Request) {
-
-	var lang = make(map[string]interface{})
+	lang := make(map[string]interface{})
 	var err error
 
-	var requestFile = strings.Replace(r.URL.Path, "/web", "html", -1)
+	requestFile := strings.Replace(r.URL.Path, "/web", "html", -1)
 	var content, contentType, file string
 
 	var language LanguageUI
@@ -605,12 +588,12 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 		lang, err = loadJSONFileToMap(fmt.Sprintf("html/lang/%s.json", Settings.Language))
 		if err != nil {
-			ShowError(err, 000)
+			ShowError(err, 0o00)
 		}
 
 	} else {
 
-		var languageFile = "html/lang/en.json"
+		languageFile := "html/lang/en.json"
 
 		if value, ok := webUI[languageFile].(string); ok {
 			content = GetHTMLString(value)
@@ -621,18 +604,16 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal([]byte(mapToJSON(lang)), &language)
 	if err != nil {
-		ShowError(err, 000)
+		ShowError(err, 0o00)
 		return
 	}
 
 	if getFilenameFromPath(requestFile) == "html" {
 
 		if System.ScanInProgress == 0 {
-
 			if len(Settings.Files.M3U) == 0 && len(Settings.Files.HDHR) == 0 {
 				System.ConfigurationWizard = true
 			}
-
 		}
 
 		switch System.ConfigurationWizard {
@@ -656,7 +637,7 @@ func Web(w http.ResponseWriter, r *http.Request) {
 			var username, password, confirm string
 			switch r.Method {
 			case "POST":
-				var allUsers, _ = authentication.GetAllUserData()
+				allUsers, _ := authentication.GetAllUserData()
 
 				username = r.FormValue("username")
 				password = r.FormValue("password")
@@ -668,7 +649,7 @@ func Web(w http.ResponseWriter, r *http.Request) {
 				// Erster Benutzer wird angelegt (Passwortbestätigung ist vorhanden)
 				if len(confirm) > 0 {
 
-					var token, err = createFirstUserForAuthentication(username, password)
+					token, err := createFirstUserForAuthentication(username, password)
 					if err != nil {
 						httpStatusError(w, r, 429)
 						return
@@ -683,7 +664,7 @@ func Web(w http.ResponseWriter, r *http.Request) {
 				// Benutzername und Passwort vorhanden, wird jetzt überprüft
 				if len(username) > 0 && len(password) > 0 {
 
-					var token, err = authentication.UserAuthentication(username, password)
+					token, err := authentication.UserAuthentication(username, password)
 					if err != nil {
 						file = requestFile + "login.html"
 						lang["authenticationErr"] = language.Login.Failed
@@ -703,7 +684,6 @@ func Web(w http.ResponseWriter, r *http.Request) {
 			case "GET":
 				lang["authenticationErr"] = ""
 				_, token, err := authentication.CheckTheValidityOfTheTokenFromHTTPHeader(w, r)
-
 				if err != nil {
 					file = requestFile + "login.html"
 					break
@@ -719,7 +699,7 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 			allUserData, err := authentication.GetAllUserData()
 			if err != nil {
-				ShowError(err, 000)
+				ShowError(err, 0o00)
 				httpStatusError(w, r, 403)
 				return
 			}
@@ -727,7 +707,6 @@ func Web(w http.ResponseWriter, r *http.Request) {
 			if len(allUserData) == 0 && Settings.AuthenticationWEB == true {
 				file = requestFile + "create-first-user.html"
 			}
-
 		}
 
 		requestFile = file
@@ -781,7 +760,6 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 // API : API request /api/
 func API(w http.ResponseWriter, r *http.Request) {
-
 	/*
 			API Bedingungen (ohne Authentifizierung):
 			- API muss in den Einstellungen aktiviert sein
@@ -833,15 +811,13 @@ func API(w http.ResponseWriter, r *http.Request) {
 	var request APIRequestStruct
 	var response APIResponseStruct
 
-	var responseAPIError = func(err error) {
-
+	responseAPIError := func(err error) {
 		var response APIResponseStruct
 
 		response.Status = false
 		response.Error = err.Error()
 		w.Write([]byte(mapToJSON(response)))
 		return
-
 	}
 
 	response.Status = true
@@ -974,9 +950,8 @@ func API(w http.ResponseWriter, r *http.Request) {
 
 // Download : Datei Download
 func Download(w http.ResponseWriter, r *http.Request) {
-
-	var path = r.URL.Path
-	var file = System.Folder.Temp + getFilenameFromPath(path)
+	path := r.URL.Path
+	file := System.Folder.Temp + getFilenameFromPath(path)
 	w.Header().Set("Content-Disposition", "attachment; filename="+getFilenameFromPath(file))
 
 	content, err := readStringFromFile(file)
@@ -991,7 +966,6 @@ func Download(w http.ResponseWriter, r *http.Request) {
 }
 
 func setDefaultResponseData(response ResponseStruct, data bool) (defaults ResponseStruct) {
-
 	defaults = response
 
 	// Folgende Daten immer an den Client übergeben
@@ -1022,13 +996,13 @@ func setDefaultResponseData(response ResponseStruct, data bool) (defaults Respon
 	if data == true {
 
 		defaults.Users, _ = authentication.GetAllUserData()
-		//defaults.DVR = System.DVRAddress
+		// defaults.DVR = System.DVRAddress
 
 		if Settings.EpgSource == "XEPG" {
 
 			defaults.ClientInfo.XEPGCount = Data.XEPG.XEPGCount
 
-			var XEPG = make(map[string]interface{})
+			XEPG := make(map[string]interface{})
 
 			if len(Data.Streams.Active) > 0 {
 
@@ -1064,7 +1038,6 @@ func httpStatusError(w http.ResponseWriter, r *http.Request, httpStatusCode int)
 }
 
 func getContentType(filename string) (contentType string) {
-
 	if strings.HasSuffix(filename, ".html") {
 		contentType = "text/html"
 	} else if strings.HasSuffix(filename, ".css") {

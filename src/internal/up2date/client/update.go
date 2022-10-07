@@ -18,7 +18,6 @@ import (
 
 // DoUpdate : Update binary
 func DoUpdate(fileType, filenameBIN string) (err error) {
-
 	var url string
 	switch fileType {
 	case "bin":
@@ -50,16 +49,16 @@ func DoUpdate(fileType, filenameBIN string) (err error) {
 
 		// Change binary filename to .filename
 		binary, err := osext.Executable()
-		var filename = getFilenameFromPath(binary)
-		var path = getPlatformPath(binary)
-		var oldBinary = path + "_old_" + filename
-		var newBinary = binary
+		filename := getFilenameFromPath(binary)
+		path := getPlatformPath(binary)
+		oldBinary := path + "_old_" + filename
+		newBinary := binary
 
 		// ZIP
-		var tmpFolder = path + "tmp"
-		var tmpFile = tmpFolder + string(os.PathSeparator) + filenameBIN
+		tmpFolder := path + "tmp"
+		tmpFile := tmpFolder + string(os.PathSeparator) + filenameBIN
 
-		//fmt.Println(binary, path+"."+filename)
+		// fmt.Println(binary, path+"."+filename)
 		os.Rename(newBinary, oldBinary)
 
 		// Save the new binary with the old file name
@@ -116,7 +115,7 @@ func DoUpdate(fileType, filenameBIN string) (err error) {
 		}
 
 		// Set the permission
-		err = os.Chmod(binary, 0755)
+		err = os.Chmod(binary, 0o755)
 
 		// Close the new file !Windows
 		out.Close()
@@ -127,14 +126,13 @@ func DoUpdate(fileType, filenameBIN string) (err error) {
 		if runtime.GOOS == "windows" {
 
 			bin, err := os.Executable()
-
 			if err != nil {
 				restorOldBinary(oldBinary, newBinary)
 				return err
 			}
 
-			var pid = os.Getpid()
-			var process, _ = os.FindProcess(pid)
+			pid := os.Getpid()
+			process, _ := os.FindProcess(pid)
 
 			if proc, err := start(bin); err == nil {
 
@@ -166,9 +164,8 @@ func DoUpdate(fileType, filenameBIN string) (err error) {
 }
 
 func start(args ...string) (p *os.Process, err error) {
-
 	if args[0], err = exec.LookPath(args[0]); err == nil {
-		//fmt.Println(args[0])
+		// fmt.Println(args[0])
 		var procAttr os.ProcAttr
 		procAttr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
 		p, err := os.StartProcess(args[0], args, &procAttr)
@@ -188,24 +185,21 @@ func restorOldBinary(oldBinary, newBinary string) {
 }
 
 func getPlatformFile(filename string) string {
-
 	path, file := filepath.Split(filename)
-	var newPath = filepath.Dir(path)
-	var newFileName = newPath + string(os.PathSeparator) + file
+	newPath := filepath.Dir(path)
+	newFileName := newPath + string(os.PathSeparator) + file
 
 	return newFileName
 }
 
 func getFilenameFromPath(path string) string {
-
 	file := filepath.Base(path)
 
 	return file
 }
 
 func getPlatformPath(path string) string {
-
-	var newPath = filepath.Dir(path) + string(os.PathSeparator)
+	newPath := filepath.Dir(path) + string(os.PathSeparator)
 
 	return newPath
 }
@@ -231,13 +225,12 @@ func copyFile(src, dst string) (err error) {
 }
 
 func extractZIP(archive, target string) (err error) {
-
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(target, 0755); err != nil {
+	if err := os.MkdirAll(target, 0o755); err != nil {
 		return err
 	}
 

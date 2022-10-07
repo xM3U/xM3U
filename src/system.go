@@ -12,7 +12,6 @@ import (
 
 // Entwicklerinfos anzeigen
 func showDevInfo() {
-
 	if System.Dev == true {
 
 		fmt.Print("\033[31m")
@@ -30,12 +29,11 @@ func showDevInfo() {
 
 // Alle Systemordner erstellen
 func createSystemFolders() (err error) {
-
 	e := reflect.ValueOf(&System.Folder).Elem()
 
 	for i := 0; i < e.NumField(); i++ {
 
-		var folder = e.Field(i).Interface().(string)
+		folder := e.Field(i).Interface().(string)
 
 		err = checkFolder(folder)
 
@@ -50,11 +48,10 @@ func createSystemFolders() (err error) {
 
 // Alle Systemdateien erstellen
 func createSystemFiles() (err error) {
-
 	var debug string
 	for _, file := range SystemFiles {
 
-		var filename = getPlatformFile(System.Folder.Config + file)
+		filename := getPlatformFile(System.Folder.Config + file)
 
 		err = checkFile(filename)
 		if err != nil {
@@ -91,15 +88,14 @@ func createSystemFiles() (err error) {
 
 // Einstellungen laden und default Werte setzen (xTeVe)
 func loadSettings() (settings SettingsStruct, err error) {
-
 	settingsMap, err := loadJSONFileToMap(System.File.Settings)
 	if err != nil {
 		return
 	}
 
 	// Deafult Werte setzten
-	var defaults = make(map[string]interface{})
-	var dataMap = make(map[string]interface{})
+	defaults := make(map[string]interface{})
+	dataMap := make(map[string]interface{})
 
 	dataMap["xmltv"] = make(map[string]interface{})
 	dataMap["m3u"] = make(map[string]interface{})
@@ -188,7 +184,6 @@ func loadSettings() (settings SettingsStruct, err error) {
 
 // Einstellungen speichern (xTeVe)
 func saveSettings(settings SettingsStruct) (err error) {
-
 	if settings.BackupKeep == 0 {
 		settings.BackupKeep = 10
 	}
@@ -221,7 +216,6 @@ func saveSettings(settings SettingsStruct) (err error) {
 
 // Zugriff über die Domain ermöglichen
 func setGlobalDomain(domain string) {
-
 	System.Domain = domain
 
 	switch Settings.AuthenticationPMS {
@@ -261,8 +255,7 @@ func createUUID() (uuid string) {
 
 // Eindeutige Geräte ID für Plex generieren
 func setDeviceID() {
-
-	var id = Settings.UUID
+	id := Settings.UUID
 
 	switch Settings.Tuner {
 	case 1:
@@ -277,7 +270,6 @@ func setDeviceID() {
 
 // Provider Streaming-URL zu xTeVe Streaming-URL konvertieren
 func createStreamingURL(streamingType, playlistID, channelNumber, channelName, url string) (streamingURL string, err error) {
-
 	var streamInfo StreamInfo
 	var serverProtocol string
 
@@ -285,12 +277,10 @@ func createStreamingURL(streamingType, playlistID, channelNumber, channelName, u
 		Data.Cache.StreamingURLS = make(map[string]StreamInfo)
 	}
 
-	var urlID = getMD5(fmt.Sprintf("%s-%s", playlistID, url))
+	urlID := getMD5(fmt.Sprintf("%s-%s", playlistID, url))
 
 	if s, ok := Data.Cache.StreamingURLS[urlID]; ok {
-
 		streamInfo = s
-
 	} else {
 
 		streamInfo.URL = url
@@ -319,7 +309,6 @@ func createStreamingURL(streamingType, playlistID, channelNumber, channelName, u
 }
 
 func getStreamInfo(urlID string) (streamInfo StreamInfo, err error) {
-
 	if len(Data.Cache.StreamingURLS) == 0 {
 
 		tmp, err := loadJSONFileToMap(System.File.URLS)
