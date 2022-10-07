@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"regexp"
 	"runtime"
 	"sort"
 
@@ -549,25 +550,39 @@ func mapping() (err error) {
 
 				for file, xmltvChannels := range Data.XMLTV.Mapping {
 
-					if channel, ok := xmltvChannels.(map[string]interface{})[tvgID]; ok {
+					if _, ok := xmltvChannels.(map[string]interface{})[tvgID]; !ok {
+						for xmlID := range xmltvChannels.(map[string]interface{}) {
+							// match xmlID with xepgChannel.Name using regex
+							sanitized := regexp.QuoteMeta(xmlID)                     // escape regex special characters
+							sanitized = strings.ReplaceAll(sanitized, "FHD", "F?HD") // Handle FHD
+							sanitized = strings.ReplaceAll(sanitized, " ", "")       // remove spaces
+							var regex = regexp.MustCompile(sanitized)
 
-						if channelID, ok := channel.(map[string]interface{})["id"].(string); ok {
-
-							xepgChannel.XmltvFile = file
-							xepgChannel.XMapping = channelID
-							xepgChannel.XActive = true
-
-							// Falls in der XMLTV Datei ein Logo existiert, wird dieses verwendet. Falls nicht, dann das Logo aus der M3U Datei
-							if icon, ok := channel.(map[string]interface{})["icon"].(string); ok {
-								if len(icon) > 0 {
-									xepgChannel.TvgLogo = icon
-								}
+							if regex.MatchString(strings.ReplaceAll(xepgChannel.Name, " ", "")) {
+								tvgID = xmlID
+								goto MAPPING
 							}
-
-							Data.XEPG.Channels[xepg] = xepgChannel
-							break
-
 						}
+						continue
+					}
+				MAPPING:
+					channel := xmltvChannels.(map[string]interface{})[tvgID].(interface{})
+
+					if channelID, ok := channel.(map[string]interface{})["id"].(string); ok {
+
+						xepgChannel.XmltvFile = file
+						xepgChannel.XMapping = channelID
+						xepgChannel.XActive = true
+
+						// Falls in der XMLTV Datei ein Logo existiert, wird dieses verwendet. Falls nicht, dann das Logo aus der M3U Datei
+						if icon, ok := channel.(map[string]interface{})["icon"].(string); ok {
+							if len(icon) > 0 {
+								xepgChannel.TvgLogo = icon
+							}
+						}
+
+						Data.XEPG.Channels[xepg] = xepgChannel
+						break
 
 					}
 
