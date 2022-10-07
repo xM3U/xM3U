@@ -11,6 +11,9 @@ import (
 	"strings"
 
 	"xteve/internal/authentication"
+	"xteve/pkg/utils"
+
+	webUI "xteve/pkg/webui"
 
 	"github.com/gorilla/websocket"
 )
@@ -595,8 +598,8 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 		languageFile := "html/lang/en.json"
 
-		if value, ok := webUI[languageFile].(string); ok {
-			content = GetHTMLString(value)
+		if value, ok := webUI.Assets[languageFile].(string); ok {
+			content = utils.GetHTMLString(value)
 			lang = jsonToMap(content)
 		}
 
@@ -711,9 +714,9 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 		requestFile = file
 
-		if value, ok := webUI[requestFile]; ok {
+		if value, ok := webUI.Assets[requestFile]; ok {
 
-			content = GetHTMLString(value.(string))
+			content = utils.GetHTMLString(value.(string))
 
 			if contentType == "text/plain" {
 				w.Header().Set("Content-Disposition", "attachment; filename="+getFilenameFromPath(requestFile))
@@ -727,9 +730,9 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	if value, ok := webUI[requestFile].(string); ok {
+	if value, ok := webUI.Assets[requestFile].(string); ok {
 
-		content = GetHTMLString(value)
+		content = utils.GetHTMLString(value)
 		contentType = getContentType(requestFile)
 
 		if contentType == "text/plain" {

@@ -6,7 +6,10 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"xteve/pkg/webui"
 )
+
+//go:generate go run ./../webui/generate.go
 
 // System : Beinhaltet alle Systeminformationen
 var System SystemStruct
@@ -193,17 +196,6 @@ func Init() (err error) {
 
 	System.URLBase = fmt.Sprintf("%s://%s:%s", System.ServerProtocol.WEB, System.IPAddress, Settings.Port)
 
-	// HTML Dateien erstellen, mit dev == true werden die lokalen HTML Dateien verwendet
-	if System.Dev == true {
-
-		HTMLInit("webUI", "src", "html"+string(os.PathSeparator), "src"+string(os.PathSeparator)+"webUI.go")
-		err = BuildGoFile()
-		if err != nil {
-			return
-		}
-
-	}
-
 	// DLNA Server starten
 	err = SSDP()
 	if err != nil {
@@ -211,7 +203,7 @@ func Init() (err error) {
 	}
 
 	// HTML Datein laden
-	loadHTMLMap()
+	webui.LoadHTMLMap()
 
 	return
 }
