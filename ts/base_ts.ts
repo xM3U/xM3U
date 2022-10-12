@@ -248,7 +248,7 @@ function sortTable(column) {
         default: console.log(x.childNodes[0].tagName);
       }
 
-      if (xValue == "" || xValue == NaN) {
+      if (xValue == "" || Number.isNaN(xValue)) {
 
         xValue = i
         sortObj[i] = rows[i];
