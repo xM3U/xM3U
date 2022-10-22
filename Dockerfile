@@ -2,29 +2,30 @@ FROM golang AS builder
 
 WORKDIR /root
 
+# Dependencies
+COPY ./go.mod ./go.sum ./
+RUN go mod download
+
 # Copy of source files
 COPY . .
-
-# Dependencies
-RUN go mod download
 
 # Disable CGO Tool
 ENV CGO_ENABLED=0
 
 # xTeVe build
-RUN go build xteve.go
+RUN go build -o xteve cmd/xteve/main.go
 
 #                    #
 # xTeVe docker image #
 #                    #
-FROM alpine:latest  
+FROM alpine:latest
 
-CMD ["/usr/local/bin/xteve", "-config", "/data"] 
+CMD ["/usr/local/bin/xteve", "-config", "/data"]
 
 ENV UID=1000
 ENV GID=1000
 
-EXPOSE 34400   
+EXPOSE 34400
 
 # User creation and installation of ca-certificates, ffmpeg and vlc
 RUN addgroup -g $UID -S xteve  && \

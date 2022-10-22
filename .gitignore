@@ -1,9 +1,11 @@
 .DS_Store
+/.vscode
 demo
 dev
 compiler
 files
 update_xteve*.sh
-xteve
-xteve.exe
+/xteve
+/xteve.exe
 de.json
+/.task
