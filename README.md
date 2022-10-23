@@ -1,5 +1,5 @@
 <p align="center" >
-    <a href="https://github.com/xM3U"><img src="html/img/logo_b_880x200.jpg" alt="xM3U" /></a>
+    <a href="https://github.com/xM3U"><img src="html/img/logo_github.png" alt="xM3U" /></a>
 </div>
 
 # xM3U - M3U Proxy for Plex DVR and Emby Live TV
