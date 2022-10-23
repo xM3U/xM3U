@@ -6,10 +6,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"xteve/pkg/webui"
 )
-
-//go:generate go run ./../webui/generate.go
 
 // System : Beinhaltet alle Systeminformationen
 var System SystemStruct
@@ -201,9 +198,6 @@ func Init() (err error) {
 	if err != nil {
 		return
 	}
-
-	// HTML Datein laden
-	webui.LoadHTMLMap()
 
 	return
 }

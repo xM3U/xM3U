@@ -13,15 +13,7 @@ tasks:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
       - go install github.com/goreleaser/goreleaser@latest
       - go mod tidy
-  generate:
-    desc: Run code generators
-    sources:
-      - ./html/**/*
-      - ./**/generate.go
-    generates:
-      - ./**/*_gen.go
-    cmds:
-      - go generate -x ./...
+
   build:
     desc: Build the binary
     sources:

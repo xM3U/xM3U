@@ -23,8 +23,6 @@ import (
 	"time"
 
 	"xteve/pkg/utils"
-
-	webUI "xteve/pkg/webui"
 )
 
 func createStreamID(stream map[int]ThisStream) (streamID int) {
@@ -153,24 +151,18 @@ func BufferingStream(playlistID, streamingURL, channelName string, w http.Respon
 
 				ShowInfo(fmt.Sprintf("Streaming Status:Playlist: %s - No new connections available. Tuner = %d", playlist.PlaylistName, playlist.Tuner))
 
-				if value, ok := webUI.Assets["html/video/stream-limit.ts"]; ok {
-
-					var content string
-					content = utils.GetHTMLString(value.(string))
-
+				content, err := ReadByteFromFile("html/video/stream-limit.ts")
+				if err == nil {
 					w.WriteHeader(200)
 					w.Header().Set("Content-type", "video/mpeg")
 					w.Header().Set("Content-Length:", "0")
 
 					for i := 1; i < 60; i++ {
 						_ = i
-						w.Write([]byte(content))
+						w.Write(content)
 						time.Sleep(time.Duration(500) * time.Millisecond)
 					}
-
-					return
 				}
-
 				return
 			}
 

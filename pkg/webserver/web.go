@@ -2,16 +2,14 @@ package webserver
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"xteve/internal/authentication"
 	"xteve/pkg/utils"
-	webUI "xteve/pkg/webui"
 	src "xteve/pkg/xteve"
 )
 
-// Web : Web Server /web/
+// Web handles the web interface. http://localhost:34400/web/
 func Web(w http.ResponseWriter, r *http.Request) {
 	lang := make(map[string]interface{})
 	var err error
@@ -23,23 +21,15 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 	src.SetGlobalDomain(r.Host)
 
-	if src.System.Dev == true {
+	languageFile := "html/lang/en.json"
 
-		lang, err = src.LoadJSONFileToMap(fmt.Sprintf("html/lang/%s.json", src.Settings.Language))
-		if err != nil {
-			src.ShowError(err, 0o00)
-		}
-
-	} else {
-
-		languageFile := "html/lang/en.json"
-
-		if value, ok := webUI.Assets[languageFile].(string); ok {
-			content = utils.GetHTMLString(value)
-			lang = src.JsonToMap(content)
-		}
-
+	value, err := src.ReadStringFromFile(languageFile)
+	if err != nil {
+		utils.HttpStatusError(w, r, 404)
+		return
 	}
+	content = value
+	lang = src.JsonToMap(content)
 
 	err = json.Unmarshal([]byte(src.MapToJSON(lang)), &language)
 	if err != nil {
@@ -47,6 +37,7 @@ func Web(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Handle the initial request for the web interface. (index.html)
 	if src.GetFilenameFromPath(requestFile) == "html" {
 
 		if src.System.ScanInProgress == 0 {
@@ -150,25 +141,13 @@ func Web(w http.ResponseWriter, r *http.Request) {
 
 		requestFile = file
 
-		if value, ok := webUI.Assets[requestFile]; ok {
-
-			content = utils.GetHTMLString(value.(string))
-
-			if contentType == "text/plain" {
-				w.Header().Set("Content-Disposition", "attachment; filename="+src.GetFilenameFromPath(requestFile))
-			}
-
-		} else {
-
+		value, err := src.ReadStringFromFile(requestFile)
+		if err != nil {
 			utils.HttpStatusError(w, r, 404)
 			return
 		}
 
-	}
-
-	if value, ok := webUI.Assets[requestFile].(string); ok {
-
-		content = utils.GetHTMLString(value)
+		content = value
 		contentType = getContentType(requestFile)
 
 		if contentType == "text/plain" {
@@ -176,11 +155,20 @@ func Web(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		utils.HttpStatusError(w, r, 404)
-		return
+		value, err := src.ReadStringFromFile(requestFile)
+		if err != nil {
+			utils.HttpStatusError(w, r, 404)
+			return
+		}
+
+		content = value
+		contentType = getContentType(requestFile)
+
 	}
 
-	contentType = getContentType(requestFile)
+	if contentType == "text/plain" {
+		w.Header().Set("Content-Disposition", "attachment; filename="+src.GetFilenameFromPath(requestFile))
+	}
 
 	if src.System.Dev == true {
 		// Lokale Webserver Dateien werden geladen, nur für die Entwicklung
