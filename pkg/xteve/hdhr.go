@@ -33,7 +33,7 @@ func makeInteraceFromHDHR(content []byte, playlistName, id string) (channels []i
 	return
 }
 
-func getCapability() (xmlContent []byte, err error) {
+func GetCapability() (xmlContent []byte, err error) {
 	var capability Capability
 	var buffer bytes.Buffer
 
@@ -63,7 +63,7 @@ func getCapability() (xmlContent []byte, err error) {
 	return
 }
 
-func getDiscover() (jsonContent []byte, err error) {
+func GetDiscover() (jsonContent []byte, err error) {
 	var discover Discover
 
 	discover.BaseURL = System.ServerProtocol.WEB + "://" + System.Domain
@@ -83,7 +83,7 @@ func getDiscover() (jsonContent []byte, err error) {
 	return
 }
 
-func getLineupStatus() (jsonContent []byte, err error) {
+func GetLineupStatus() (jsonContent []byte, err error) {
 	var lineupStatus LineupStatus
 
 	lineupStatus.ScanInProgress = System.ScanInProgress
@@ -96,7 +96,7 @@ func getLineupStatus() (jsonContent []byte, err error) {
 	return
 }
 
-func getLineup() (jsonContent []byte, err error) {
+func GetLineup() (jsonContent []byte, err error) {
 	var lineup Lineup
 
 	switch Settings.EpgSource {
@@ -106,7 +106,7 @@ func getLineup() (jsonContent []byte, err error) {
 
 			var m3uChannel M3UChannelStructXEPG
 
-			err = json.Unmarshal([]byte(mapToJSON(dsa)), &m3uChannel)
+			err = json.Unmarshal([]byte(MapToJSON(dsa)), &m3uChannel)
 			if err != nil {
 				return
 			}
@@ -142,7 +142,7 @@ func getLineup() (jsonContent []byte, err error) {
 		for _, dxc := range Data.XEPG.Channels {
 
 			var xepgChannel XEPGChannelStruct
-			err = json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+			err = json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 			if err != nil {
 				return
 			}
@@ -179,7 +179,7 @@ func getGuideNumberPMS(channelName string) (pmsID string, err error) {
 
 		Data.Cache.PMS = make(map[string]string)
 
-		pms, err := loadJSONFileToMap(System.File.PMS)
+		pms, err := LoadJSONFileToMap(System.File.PMS)
 		if err != nil {
 			return "", err
 		}
@@ -202,7 +202,7 @@ func getGuideNumberPMS(channelName string) (pmsID string, err error) {
 			ids = append(ids, v)
 		}
 
-		if indexOfString(id, ids) != -1 {
+		if IndexOfString(id, ids) != -1 {
 			i++
 			goto newID
 		}

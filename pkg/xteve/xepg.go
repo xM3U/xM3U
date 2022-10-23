@@ -38,7 +38,7 @@ func checkXMLCompatibility(id string, body []byte) (err error) {
 }
 
 // XEPG Daten erstellen
-func buildXEPG(background bool) {
+func BuildXEPG(background bool) {
 	if System.ScanInProgress == 1 {
 		return
 	}
@@ -65,16 +65,16 @@ func buildXEPG(background bool) {
 				createXMLTVFile()
 				createM3UFile()
 
-				showInfo("XEPG:" + fmt.Sprintf("Ready to use"))
+				ShowInfo("XEPG:" + fmt.Sprintf("Ready to use"))
 
 				if Settings.CacheImages == true && System.ImageCachingInProgress == 0 {
 					go func() {
 						System.ImageCachingInProgress = 1
-						showInfo(fmt.Sprintf("Image Caching:Images are cached (%d)", len(Data.Cache.Images.Queue)))
+						ShowInfo(fmt.Sprintf("Image Caching:Images are cached (%d)", len(Data.Cache.Images.Queue)))
 
 						Data.Cache.Images.Image.Caching()
 						Data.Cache.Images.Image.Remove()
-						showInfo("Image Caching:Done")
+						ShowInfo("Image Caching:Done")
 
 						createXMLTVFile()
 						createM3UFile()
@@ -107,11 +107,11 @@ func buildXEPG(background bool) {
 				if Settings.CacheImages == true && System.ImageCachingInProgress == 0 {
 					go func() {
 						System.ImageCachingInProgress = 1
-						showInfo(fmt.Sprintf("Image Caching:Images are cached (%d)", len(Data.Cache.Images.Queue)))
+						ShowInfo(fmt.Sprintf("Image Caching:Images are cached (%d)", len(Data.Cache.Images.Queue)))
 
 						Data.Cache.Images.Image.Caching()
 						Data.Cache.Images.Image.Remove()
-						showInfo("Image Caching:Done")
+						ShowInfo("Image Caching:Done")
 
 						createXMLTVFile()
 						createM3UFile()
@@ -120,7 +120,7 @@ func buildXEPG(background bool) {
 					}()
 				}
 
-				showInfo("XEPG:" + fmt.Sprintf("Ready to use"))
+				ShowInfo("XEPG:" + fmt.Sprintf("Ready to use"))
 
 				System.ScanInProgress = 0
 
@@ -133,7 +133,7 @@ func buildXEPG(background bool) {
 		}
 	} else {
 
-		getLineup()
+		GetLineup()
 		System.ScanInProgress = 0
 
 	}
@@ -159,7 +159,7 @@ func updateXEPG(background bool) {
 			go func() {
 				createXMLTVFile()
 				createM3UFile()
-				showInfo("XEPG:" + fmt.Sprintf("Ready to use"))
+				ShowInfo("XEPG:" + fmt.Sprintf("Ready to use"))
 
 				System.ScanInProgress = 0
 			}()
@@ -207,8 +207,8 @@ func createXEPGMapping() {
 			file := Data.XMLTV.Files[i]
 
 			var err error
-			fileID := strings.TrimSuffix(getFilenameFromPath(file), path.Ext(getFilenameFromPath(file)))
-			showInfo("XEPG:" + "Parse XMLTV file: " + getProviderParameter(fileID, "xmltv", "name"))
+			fileID := strings.TrimSuffix(GetFilenameFromPath(file), path.Ext(GetFilenameFromPath(file)))
+			ShowInfo("XEPG:" + "Parse XMLTV file: " + getProviderParameter(fileID, "xmltv", "name"))
 
 			// xmltv, err = getLocalXMLTV(file)
 			var xmltv XMLTV
@@ -238,8 +238,8 @@ func createXEPGMapping() {
 
 				}
 
-				tmpMap[getFilenameFromPath(file)] = xmltvMap
-				Data.XMLTV.Mapping[getFilenameFromPath(file)] = xmltvMap
+				tmpMap[GetFilenameFromPath(file)] = xmltvMap
+				Data.XMLTV.Mapping[GetFilenameFromPath(file)] = xmltvMap
 
 			}
 
@@ -250,7 +250,7 @@ func createXEPGMapping() {
 
 	} else {
 		if System.ConfigurationWizard == false {
-			showWarning(1007)
+			ShowWarning(1007)
 		}
 	}
 
@@ -280,7 +280,7 @@ func createXEPGDatabase() (err error) {
 	Data.Cache.Streams.Active = make([]string, 0, System.UnfilteredChannelLimit)
 	Data.XEPG.Channels = make(map[string]interface{}, System.UnfilteredChannelLimit)
 
-	Data.XEPG.Channels, err = loadJSONFileToMap(System.File.XEPG)
+	Data.XEPG.Channels, err = LoadJSONFileToMap(System.File.XEPG)
 	if err != nil {
 		ShowError(err, 1004)
 		return err
@@ -325,13 +325,13 @@ func createXEPGDatabase() (err error) {
 		return hex.EncodeToString(hash[:])
 	}
 
-	showInfo("XEPG:" + "Update database")
+	ShowInfo("XEPG:" + "Update database")
 
 	// Kanal mit fehlenden Kanalnummern löschen.  Delete channel with missing channel numbers
 	for id, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err = json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err = json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 		if err != nil {
 			return
 		}
@@ -350,7 +350,7 @@ func createXEPGDatabase() (err error) {
 	xepgChannelsValuesMap := make(map[string]XEPGChannelStruct, System.UnfilteredChannelLimit)
 	for _, v := range Data.XEPG.Channels {
 		var channel XEPGChannelStruct
-		err = json.Unmarshal([]byte(mapToJSON(v)), &channel)
+		err = json.Unmarshal([]byte(MapToJSON(v)), &channel)
 		if err != nil {
 			return
 		}
@@ -366,7 +366,7 @@ func createXEPGDatabase() (err error) {
 
 		var m3uChannel M3UChannelStructXEPG
 
-		err = json.Unmarshal([]byte(mapToJSON(dsa)), &m3uChannel)
+		err = json.Unmarshal([]byte(MapToJSON(dsa)), &m3uChannel)
 		if err != nil {
 			return
 		}
@@ -417,7 +417,7 @@ func createXEPGDatabase() (err error) {
 		case true:
 			// Bereits vorhandener Kanal
 			var xepgChannel XEPGChannelStruct
-			err = json.Unmarshal([]byte(mapToJSON(Data.XEPG.Channels[currentXEPGID])), &xepgChannel)
+			err = json.Unmarshal([]byte(MapToJSON(Data.XEPG.Channels[currentXEPGID])), &xepgChannel)
 			if err != nil {
 				return
 			}
@@ -476,7 +476,7 @@ func createXEPGDatabase() (err error) {
 		}
 
 	}
-	showInfo("XEPG:" + "Save DB file")
+	ShowInfo("XEPG:" + "Save DB file")
 	err = saveMapToJSONFile(System.File.XEPG, Data.XEPG.Channels)
 	if err != nil {
 		return
@@ -487,12 +487,12 @@ func createXEPGDatabase() (err error) {
 
 // Kanäle automatisch zuordnen und das Mapping überprüfen
 func mapping() (err error) {
-	showInfo("XEPG:" + "Map channels")
+	ShowInfo("XEPG:" + "Map channels")
 
 	for xepg, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err = json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err = json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 		if err != nil {
 			return
 		}
@@ -571,16 +571,16 @@ func mapping() (err error) {
 					} else {
 
 						ShowError(fmt.Errorf(fmt.Sprintf("Missing EPG data: %s", xepgChannel.Name)), 0)
-						showWarning(2302)
+						ShowWarning(2302)
 						xepgChannel.XActive = false
 
 					}
 				} else {
 
-					fileID := strings.TrimSuffix(getFilenameFromPath(file), path.Ext(getFilenameFromPath(file)))
+					fileID := strings.TrimSuffix(GetFilenameFromPath(file), path.Ext(GetFilenameFromPath(file)))
 
 					ShowError(fmt.Errorf("Missing XMLTV file: %s", getProviderParameter(fileID, "xmltv", "name")), 0)
-					showWarning(2301)
+					ShowWarning(2301)
 					xepgChannel.XActive = false
 
 				}
@@ -623,7 +623,7 @@ func createXMLTVFile() (err error) {
 	files, err := ioutil.ReadDir(System.Folder.ImagesCache)
 	if err == nil {
 		for _, file := range files {
-			if indexOfString(file.Name(), Data.Cache.ImagesCache) == -1 {
+			if IndexOfString(file.Name(), Data.Cache.ImagesCache) == -1 {
 				Data.Cache.ImagesCache = append(Data.Cache.ImagesCache, file.Name())
 			}
 		}
@@ -634,7 +634,7 @@ func createXMLTVFile() (err error) {
 		return
 	}
 
-	showInfo("XEPG:" + fmt.Sprintf("Create XMLTV file (%s)", System.File.XML))
+	ShowInfo("XEPG:" + fmt.Sprintf("Create XMLTV file (%s)", System.File.XML))
 
 	var xepgXML XMLTV
 
@@ -651,7 +651,7 @@ func createXMLTVFile() (err error) {
 	for _, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err := json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err := json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 		if err == nil {
 			if xepgChannel.XActive == true {
 
@@ -681,7 +681,7 @@ func createXMLTVFile() (err error) {
 	xmlOutput := []byte(xml.Header + string(content))
 	writeByteToFile(System.File.XML, xmlOutput)
 
-	showInfo("XEPG:" + fmt.Sprintf("Compress XMLTV file (%s)", System.Compressed.GZxml))
+	ShowInfo("XEPG:" + fmt.Sprintf("Compress XMLTV file (%s)", System.Compressed.GZxml))
 	err = compressGZIP(&xmlOutput, System.Compressed.GZxml)
 
 	xepgXML = XMLTV{}
@@ -785,7 +785,7 @@ func createDummyProgram(xepgChannel XEPGChannelStruct) (dummyXMLTV XMLTV) {
 	currentDay := currentTime.Format("20060102")
 	startTime, _ := time.Parse("20060102150405", currentDay+"000000")
 
-	showInfo("Create Dummy Guide:" + "Time offset" + offset + " - " + xepgChannel.XName)
+	ShowInfo("Create Dummy Guide:" + "Time offset" + offset + " - " + xepgChannel.XName)
 
 	dl := strings.Split(xepgChannel.XMapping, "_")
 	dummyLength, err := strconv.Atoi(dl[0])
@@ -935,7 +935,7 @@ func getLocalXMLTV(file string, xmltv *XMLTV) (err error) {
 		}
 
 		// XML Daten lesen
-		content, err := readByteFromFile(file)
+		content, err := ReadByteFromFile(file)
 		// Lokale XML Datei existiert nicht im Ordner: data
 		if err != nil {
 			ShowError(err, 1004)
@@ -960,8 +960,8 @@ func getLocalXMLTV(file string, xmltv *XMLTV) (err error) {
 
 // M3U Datei erstellen
 func createM3UFile() {
-	showInfo("XEPG:" + fmt.Sprintf("Create M3U file (%s)", System.File.M3U))
-	_, err := buildM3U([]string{})
+	ShowInfo("XEPG:" + fmt.Sprintf("Create M3U file (%s)", System.File.M3U))
+	_, err := BuildM3U([]string{})
 	if err != nil {
 		ShowError(err, 0o00)
 	}
@@ -985,16 +985,16 @@ func cleanupXEPG() {
 		sourceIDs = append(sourceIDs, source)
 	}
 
-	showInfo("XEPG:" + fmt.Sprintf("Cleanup database"))
+	ShowInfo("XEPG:" + fmt.Sprintf("Cleanup database"))
 	Data.XEPG.XEPGCount = 0
 
 	for id, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err := json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err := json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 		if err == nil {
 
-			if indexOfString(xepgChannel.Name+xepgChannel.FileM3UID, Data.Cache.Streams.Active) == -1 {
+			if IndexOfString(xepgChannel.Name+xepgChannel.FileM3UID, Data.Cache.Streams.Active) == -1 {
 				delete(Data.XEPG.Channels, id)
 			} else {
 				if xepgChannel.XActive == true {
@@ -1002,7 +1002,7 @@ func cleanupXEPG() {
 				}
 			}
 
-			if indexOfString(xepgChannel.FileM3UID, sourceIDs) == -1 {
+			if IndexOfString(xepgChannel.FileM3UID, sourceIDs) == -1 {
 				delete(Data.XEPG.Channels, id)
 			}
 
@@ -1016,10 +1016,10 @@ func cleanupXEPG() {
 		return
 	}
 
-	showInfo("XEPG Channels:" + fmt.Sprintf("%d", Data.XEPG.XEPGCount))
+	ShowInfo("XEPG Channels:" + fmt.Sprintf("%d", Data.XEPG.XEPGCount))
 
 	if len(Data.Streams.Active) > 0 && Data.XEPG.XEPGCount == 0 {
-		showWarning(2005)
+		ShowWarning(2005)
 	}
 
 	return
@@ -1032,7 +1032,7 @@ func getStreamByChannelID(channelID string) (playlistID, streamURL string, err e
 	for _, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err := json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err := json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 
 		fmt.Println(xepgChannel.XChannelID)
 

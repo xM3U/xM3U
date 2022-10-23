@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func showInfo(str string) {
+func ShowInfo(str string) {
 	if System.Flag.Info == true {
 		return
 	}
@@ -41,7 +41,7 @@ func showInfo(str string) {
 	return
 }
 
-func showDebug(str string, level int) {
+func ShowDebug(str string, level int) {
 	if System.Flag.Debug < level {
 		return
 	}
@@ -74,7 +74,7 @@ func showDebug(str string, level int) {
 	return
 }
 
-func showHighlight(str string) {
+func ShowHighlight(str string) {
 	max := 23
 	msg := strings.SplitN(str, ":", 2)
 	length := len(msg[0])
@@ -105,8 +105,8 @@ func showHighlight(str string) {
 	return
 }
 
-func showWarning(errCode int) {
-	errMsg := getErrMsg(errCode)
+func ShowWarning(errCode int) {
+	errMsg := GetErrMsg(errCode)
 	logMsg := fmt.Sprintf("[%s] [WARNING] %s", System.Name, errMsg)
 	mutex := sync.RWMutex{}
 
@@ -124,7 +124,7 @@ func showWarning(errCode int) {
 func ShowError(err error, errCode int) {
 	mutex := sync.RWMutex{}
 
-	errMsg := getErrMsg(errCode)
+	errMsg := GetErrMsg(errCode)
 	logMsg := fmt.Sprintf("[%s] [ERROR] %s (%s) - EC: %d", System.Name, err, errMsg, errCode)
 
 	printLogOnScreen(logMsg, "error")
@@ -207,7 +207,7 @@ func logCleanUp() {
 }
 
 // Fehlercodes
-func getErrMsg(errCode int) (errMsg string) {
+func GetErrMsg(errCode int) (errMsg string) {
 	switch errCode {
 
 	case 0:

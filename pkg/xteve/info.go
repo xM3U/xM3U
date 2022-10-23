@@ -8,13 +8,13 @@ import (
 // ShowSystemInfo : Systeminformationen anzeigen
 func ShowSystemInfo() {
 	fmt.Print("Creating the information takes a moment...")
-	err := buildDatabaseDVR()
+	err := BuildDatabaseDVR()
 	if err != nil {
 		ShowError(err, 0)
 		return
 	}
 
-	buildXEPG(false)
+	BuildXEPG(false)
 
 	fmt.Println("OK")
 	println()

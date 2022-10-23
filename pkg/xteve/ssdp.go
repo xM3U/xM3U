@@ -16,7 +16,7 @@ func SSDP() (err error) {
 		return
 	}
 
-	showInfo(fmt.Sprintf("SSDP / DLNA:%t", Settings.SSDP))
+	ShowInfo(fmt.Sprintf("SSDP / DLNA:%t", Settings.SSDP))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)

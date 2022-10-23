@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strings"
 
+	"xteve/pkg/webserver"
 	src "xteve/pkg/xteve"
 )
 
@@ -205,7 +206,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	err = src.StartWebserver()
+	err = webserver.StartWebserver()
 	if err != nil {
 		src.ShowError(err, 0)
 		os.Exit(0)

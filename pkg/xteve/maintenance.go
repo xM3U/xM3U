@@ -27,7 +27,7 @@ func maintenance() {
 			for _, schedule := range Settings.Update {
 				if schedule == t.Format("1504") {
 
-					showInfo("Update:" + schedule)
+					ShowInfo("Update:" + schedule)
 
 					// Backup erstellen
 					err := xTeVeAutoBackup()
@@ -36,15 +36,15 @@ func maintenance() {
 					}
 
 					// Playlist und XMLTV Dateien aktualisieren
-					getProviderData("m3u", "")
-					getProviderData("hdhr", "")
+					GetProviderData("m3u", "")
+					GetProviderData("hdhr", "")
 
 					if Settings.EpgSource == "XEPG" {
-						getProviderData("xmltv", "")
+						GetProviderData("xmltv", "")
 					}
 
 					// Datenbank für DVR erstellen
-					err = buildDatabaseDVR()
+					err = BuildDatabaseDVR()
 					if err != nil {
 						ShowError(err, 0o00)
 					}
@@ -55,7 +55,7 @@ func maintenance() {
 
 					// XEPG Dateien erstellen
 					Data.Cache.XMLTV = make(map[string]XMLTV)
-					buildXEPG(false)
+					BuildXEPG(false)
 
 				}
 			}

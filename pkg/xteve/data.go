@@ -16,9 +16,9 @@ import (
 )
 
 // Einstellungen ändern (WebUI)
-func updateServerSettings(request RequestStruct) (settings SettingsStruct, err error) {
-	oldSettings := jsonToMap(mapToJSON(Settings))
-	newSettings := jsonToMap(mapToJSON(request.Settings))
+func UpdateServerSettings(request RequestStruct) (settings SettingsStruct, err error) {
+	oldSettings := JsonToMap(MapToJSON(Settings))
+	newSettings := JsonToMap(MapToJSON(request.Settings))
 	reloadData := false
 	cacheImages := false
 	createXEPGFiles := false
@@ -32,7 +32,7 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 			switch key {
 
 			case "tuner":
-				showWarning(2105)
+				ShowWarning(2105)
 
 			case "epgSource":
 				reloadData = true
@@ -135,13 +135,13 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 				debug = fmt.Sprintf("%T", value)
 			}
 
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
 		}
 	}
 
 	// Einstellungen aktualisieren
-	err = json.Unmarshal([]byte(mapToJSON(oldSettings)), &Settings)
+	err = json.Unmarshal([]byte(MapToJSON(oldSettings)), &Settings)
 	if err != nil {
 		return
 	}
@@ -170,14 +170,14 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 	case "ffmpeg":
 
 		if len(Settings.FFmpegPath) == 0 {
-			err = errors.New(getErrMsg(2020))
+			err = errors.New(GetErrMsg(2020))
 			return
 		}
 
 	case "vlc":
 
 		if len(Settings.VLCPath) == 0 {
-			err = errors.New(getErrMsg(2021))
+			err = errors.New(GetErrMsg(2021))
 			return
 		}
 
@@ -190,12 +190,12 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 
 		if reloadData == true {
 
-			err = buildDatabaseDVR()
+			err = BuildDatabaseDVR()
 			if err != nil {
 				return
 			}
 
-			buildXEPG(false)
+			BuildXEPG(false)
 
 		}
 
@@ -219,14 +219,14 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 						createM3UFile()
 
 						System.ImageCachingInProgress = 1
-						showInfo("Image Caching:Images are cached")
+						ShowInfo("Image Caching:Images are cached")
 
 						Data.Cache.Images.Image.Caching()
-						showInfo("Image Caching:Done")
+						ShowInfo("Image Caching:Done")
 
 						System.ImageCachingInProgress = 0
 
-						buildXEPG(false)
+						BuildXEPG(false)
 					}()
 
 				}
@@ -247,7 +247,7 @@ func updateServerSettings(request RequestStruct) (settings SettingsStruct, err e
 }
 
 // Providerdaten speichern (WebUI)
-func saveFiles(request RequestStruct, fileType string) (err error) {
+func SaveFiles(request RequestStruct, fileType string) (err error) {
 	filesMap := make(map[string]interface{})
 	newData := make(map[string]interface{})
 	var indicator string
@@ -310,7 +310,7 @@ func saveFiles(request RequestStruct, fileType string) (err error) {
 		if _, ok := data.(map[string]interface{})["new"]; ok {
 
 			reloadData = true
-			err = getProviderData(fileType, dataID)
+			err = GetProviderData(fileType, dataID)
 			delete(data.(map[string]interface{}), "new")
 
 			if err != nil {
@@ -334,12 +334,12 @@ func saveFiles(request RequestStruct, fileType string) (err error) {
 
 		if reloadData == true {
 
-			err = buildDatabaseDVR()
+			err = BuildDatabaseDVR()
 			if err != nil {
 				return err
 			}
 
-			buildXEPG(false)
+			BuildXEPG(false)
 
 		}
 
@@ -351,7 +351,7 @@ func saveFiles(request RequestStruct, fileType string) (err error) {
 }
 
 // Providerdaten manuell aktualisieren (WebUI)
-func updateFile(request RequestStruct, fileType string) (err error) {
+func UpdateFile(request RequestStruct, fileType string) (err error) {
 	updateData := make(map[string]interface{})
 
 	switch fileType {
@@ -368,10 +368,10 @@ func updateFile(request RequestStruct, fileType string) (err error) {
 
 	for dataID := range updateData {
 
-		err = getProviderData(fileType, dataID)
+		err = GetProviderData(fileType, dataID)
 		if err == nil {
-			err = buildDatabaseDVR()
-			buildXEPG(false)
+			err = BuildDatabaseDVR()
+			BuildXEPG(false)
 		}
 
 	}
@@ -408,7 +408,7 @@ func deleteLocalProviderFiles(dataID, fileType string) {
 }
 
 // Filtereinstellungen speichern (WebUI)
-func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
+func SaveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 	filterMap := make(map[int64]interface{})
 	newData := make(map[int64]interface{})
 	var defaultFilter FilterStruct
@@ -437,7 +437,7 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 			// Neuer Filter
 			newFilter = true
 			dataID = createNewID()
-			filterMap[dataID] = jsonToMap(mapToJSON(defaultFilter))
+			filterMap[dataID] = JsonToMap(MapToJSON(defaultFilter))
 
 		}
 
@@ -453,7 +453,7 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 			if filter, ok := data.(map[string]interface{})["filter"].(string); ok {
 				if len(filter) == 0 {
 
-					err = errors.New(getErrMsg(1014))
+					err = errors.New(GetErrMsg(1014))
 					if newFilter == true {
 						delete(filterMap, dataID)
 					}
@@ -477,18 +477,18 @@ func saveFilter(request RequestStruct) (settings SettingsStruct, err error) {
 
 	settings = Settings
 
-	err = buildDatabaseDVR()
+	err = BuildDatabaseDVR()
 	if err != nil {
 		return
 	}
 
-	buildXEPG(false)
+	BuildXEPG(false)
 
 	return
 }
 
 // XEPG Mapping speichern
-func saveXEpgMapping(request RequestStruct) (err error) {
+func SaveXEpgMapping(request RequestStruct) (err error) {
 	tmp := Data.XEPG
 
 	Data.Cache.Images, err = imgcache.New(System.Folder.ImagesCache, fmt.Sprintf("%s://%s/images/", System.ServerProtocol.WEB, System.Domain), Settings.CacheImages)
@@ -496,7 +496,7 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 		ShowError(err, 0)
 	}
 
-	err = json.Unmarshal([]byte(mapToJSON(request.EpgMapping)), &tmp)
+	err = json.Unmarshal([]byte(MapToJSON(request.EpgMapping)), &tmp)
 	if err != nil {
 		return
 	}
@@ -513,7 +513,7 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 		System.ScanInProgress = 1
 		cleanupXEPG()
 		System.ScanInProgress = 0
-		buildXEPG(true)
+		BuildXEPG(true)
 
 	} else {
 		// Wenn während des erstellen der Datanbank das Mapping erneut gespeichert wird, wird die Datenbank erst später erneut aktualisiert.
@@ -535,8 +535,8 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 			System.ScanInProgress = 1
 			cleanupXEPG()
 			System.ScanInProgress = 0
-			buildXEPG(false)
-			showInfo("XEPG:" + fmt.Sprintf("Ready to use"))
+			BuildXEPG(false)
+			ShowInfo("XEPG:" + fmt.Sprintf("Ready to use"))
 
 			System.BackgroundProcess = false
 		}()
@@ -546,7 +546,7 @@ func saveXEpgMapping(request RequestStruct) (err error) {
 }
 
 // Benutzerdaten speichern (WebUI)
-func saveUserData(request RequestStruct) (err error) {
+func SaveUserData(request RequestStruct) (err error) {
 	userData := request.UserData
 
 	newCredentials := func(userID string, newUserData map[string]interface{}) (err error) {
@@ -598,7 +598,7 @@ func saveUserData(request RequestStruct) (err error) {
 }
 
 // Neuen Benutzer anlegen (WebUI)
-func saveNewUser(request RequestStruct) (err error) {
+func SaveNewUser(request RequestStruct) (err error) {
 	data := request.UserData
 	username := data["username"].(string)
 	password := data["password"].(string)
@@ -616,8 +616,8 @@ func saveNewUser(request RequestStruct) (err error) {
 }
 
 // Wizard (WebUI)
-func saveWizard(request RequestStruct) (nextStep int, err error) {
-	wizard := jsonToMap(mapToJSON(request.Wizard))
+func SaveWizard(request RequestStruct) (nextStep int, err error) {
+	wizard := JsonToMap(MapToJSON(request.Wizard))
 
 	for key, value := range wizard {
 		switch key {
@@ -665,7 +665,7 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 				Settings.Files.M3U = filesMap
 				nextStep = 3
 
-				err = getProviderData(key, dataID)
+				err = GetProviderData(key, dataID)
 
 				if err != nil {
 					ShowError(err, 0o00)
@@ -673,7 +673,7 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 					return
 				}
 
-				err = buildDatabaseDVR()
+				err = BuildDatabaseDVR()
 				if err != nil {
 					ShowError(err, 0o00)
 					delete(filesMap, dataID)
@@ -688,7 +688,7 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 				Settings.Files.XMLTV = filesMap
 				nextStep = 10
 
-				err = getProviderData(key, dataID)
+				err = GetProviderData(key, dataID)
 
 				if err != nil {
 
@@ -698,7 +698,7 @@ func saveWizard(request RequestStruct) (nextStep int, err error) {
 
 				}
 
-				buildXEPG(false)
+				BuildXEPG(false)
 				System.ScanInProgress = 0
 
 			}
@@ -725,7 +725,7 @@ func createFilterRules() (err error) {
 
 		var exclude, include string
 
-		err = json.Unmarshal([]byte(mapToJSON(f)), &filter)
+		err = json.Unmarshal([]byte(MapToJSON(f)), &filter)
 		if err != nil {
 			return
 		}
@@ -761,7 +761,7 @@ func createFilterRules() (err error) {
 }
 
 // Datenbank für das DVR System erstellen
-func buildDatabaseDVR() (err error) {
+func BuildDatabaseDVR() (err error) {
 	System.ScanInProgress = 1
 
 	Data.Streams.All = make([]interface{}, 0, System.UnfilteredChannelLimit)
@@ -792,7 +792,7 @@ func buildDatabaseDVR() (err error) {
 			keys := []string{"group-title", "tvg-id", "uuid"}
 			compatibility := make(map[string]int)
 
-			id := strings.TrimSuffix(getFilenameFromPath(i), path.Ext(getFilenameFromPath(i)))
+			id := strings.TrimSuffix(GetFilenameFromPath(i), path.Ext(GetFilenameFromPath(i)))
 			playlistName := getProviderParameter(id, fileType, "name")
 
 			switch fileType {
@@ -930,17 +930,17 @@ func buildDatabaseDVR() (err error) {
 	}
 
 	if len(Data.Streams.Active) > System.PlexChannelLimit {
-		showWarning(2000)
+		ShowWarning(2000)
 	}
 
 	if len(Settings.Filter) == 0 && len(Data.Streams.All) > System.UnfilteredChannelLimit {
-		showWarning(2001)
+		ShowWarning(2001)
 	}
 
 	System.ScanInProgress = 0
-	showInfo(fmt.Sprintf("All streams:%d", len(Data.Streams.All)))
-	showInfo(fmt.Sprintf("Active streams:%d", len(Data.Streams.Active)))
-	showInfo(fmt.Sprintf("Filter:%d", len(Data.Filter)))
+	ShowInfo(fmt.Sprintf("All streams:%d", len(Data.Streams.All)))
+	ShowInfo(fmt.Sprintf("Active streams:%d", len(Data.Streams.Active)))
+	ShowInfo(fmt.Sprintf("Filter:%d", len(Data.Filter)))
 
 	sort.Strings(Data.StreamPreviewUI.Active)
 	sort.Strings(Data.StreamPreviewUI.Inactive)

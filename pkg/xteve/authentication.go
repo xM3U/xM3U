@@ -25,7 +25,7 @@ func activatedSystemAuthentication() (err error) {
 	return
 }
 
-func createFirstUserForAuthentication(username, password string) (token string, err error) {
+func CreateFirstUserForAuthentication(username, password string) (token string, err error) {
 	authenticationErr := func(err error) {
 		if err != nil {
 			return
@@ -59,7 +59,7 @@ func createFirstUserForAuthentication(username, password string) (token string, 
 	return
 }
 
-func tokenAuthentication(token string) (newToken string, err error) {
+func TokenAuthentication(token string) (newToken string, err error) {
 	if System.ConfigurationWizard == true {
 		return
 	}
@@ -69,7 +69,7 @@ func tokenAuthentication(token string) (newToken string, err error) {
 	return
 }
 
-func basicAuth(r *http.Request, level string) (username string, err error) {
+func BasicAuth(r *http.Request, level string) (username string, err error) {
 	err = errors.New("User authentication failed")
 
 	auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
@@ -89,12 +89,12 @@ func basicAuth(r *http.Request, level string) (username string, err error) {
 		return
 	}
 
-	err = checkAuthorizationLevel(token, level)
+	err = CheckAuthorizationLevel(token, level)
 
 	return
 }
 
-func urlAuth(r *http.Request, requestType string) (err error) {
+func UrlAuth(r *http.Request, requestType string) (err error) {
 	var level, token string
 
 	username := r.URL.Query().Get("username")
@@ -109,7 +109,7 @@ func urlAuth(r *http.Request, requestType string) (err error) {
 			if err != nil {
 				return
 			}
-			err = checkAuthorizationLevel(token, level)
+			err = CheckAuthorizationLevel(token, level)
 		}
 
 	case "xml":
@@ -119,7 +119,7 @@ func urlAuth(r *http.Request, requestType string) (err error) {
 			if err != nil {
 				return
 			}
-			err = checkAuthorizationLevel(token, level)
+			err = CheckAuthorizationLevel(token, level)
 		}
 
 	}
@@ -127,7 +127,7 @@ func urlAuth(r *http.Request, requestType string) (err error) {
 	return
 }
 
-func checkAuthorizationLevel(token, level string) (err error) {
+func CheckAuthorizationLevel(token, level string) (err error) {
 	authenticationErr := func(err error) {
 		if err != nil {
 			return

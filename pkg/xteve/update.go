@@ -14,7 +14,7 @@ import (
 // BinaryUpdate : Binary Update Prozess. Git Branch master und beta wird von GitHub geladen.
 func BinaryUpdate() (err error) {
 	if System.GitHub.Update == false {
-		showWarning(2099)
+		ShowWarning(2099)
 		return
 	}
 
@@ -74,11 +74,11 @@ func BinaryUpdate() (err error) {
 		updater.URL = Settings.UpdateURL
 
 		if len(updater.URL) == 0 {
-			showInfo(fmt.Sprintf("Update URL:No server URL specified, update will not be performed. Branch: %s", System.Branch))
+			ShowInfo(fmt.Sprintf("Update URL:No server URL specified, update will not be performed. Branch: %s", System.Branch))
 			return
 		}
 
-		showInfo("Update URL:" + updater.URL)
+		ShowInfo("Update URL:" + updater.URL)
 		fmt.Println("-----------------")
 
 		// Versionsinformationen vom Server laden
@@ -86,7 +86,7 @@ func BinaryUpdate() (err error) {
 		if err != nil {
 
 			debug = fmt.Sprintf(err.Error())
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
 			return nil
 		}
@@ -109,21 +109,21 @@ func BinaryUpdate() (err error) {
 			// Update durchführen
 			var fileType, url string
 
-			showInfo(fmt.Sprintf("Update Available:Version: %s", updater.Response.Version))
+			ShowInfo(fmt.Sprintf("Update Available:Version: %s", updater.Response.Version))
 
 			switch System.Branch {
 
 			// Update von GitHub
 			case "master", "beta":
-				showInfo(fmt.Sprintf("Update Server:GitHub"))
+				ShowInfo(fmt.Sprintf("Update Server:GitHub"))
 
 			// Update vom eigenen Server
 			default:
-				showInfo(fmt.Sprintf("Update Server:%s", Settings.UpdateURL))
+				ShowInfo(fmt.Sprintf("Update Server:%s", Settings.UpdateURL))
 
 			}
 
-			showInfo(fmt.Sprintf("Start Update:Branch: %s", updater.Branch))
+			ShowInfo(fmt.Sprintf("Start Update:Branch: %s", updater.Branch))
 
 			// Neue Version als BIN Datei herunterladen
 			if len(updater.Response.UpdateBIN) > 0 {
@@ -148,7 +148,7 @@ func BinaryUpdate() (err error) {
 
 		} else {
 			// Hinweis ausgeben
-			showWarning(6004)
+			ShowWarning(6004)
 		}
 	}
 
@@ -157,7 +157,7 @@ func BinaryUpdate() (err error) {
 
 func conditionalUpdateChanges() (err error) {
 checkVersion:
-	settingsMap, err := loadJSONFileToMap(System.File.Settings)
+	settingsMap, err := LoadJSONFileToMap(System.File.Settings)
 	if err != nil || len(settingsMap) == 0 {
 		return
 	}
@@ -165,15 +165,15 @@ checkVersion:
 	if settingsVersion, ok := settingsMap["version"].(string); ok {
 
 		if settingsVersion > System.DBVersion {
-			showInfo("Settings DB Version:" + settingsVersion)
-			showInfo("System DB Version:" + System.DBVersion)
-			err = errors.New(getErrMsg(1031))
+			ShowInfo("Settings DB Version:" + settingsVersion)
+			ShowInfo("System DB Version:" + System.DBVersion)
+			err = errors.New(GetErrMsg(1031))
 			return
 		}
 
 		// Letzte Kompatible Version (1.4.4)
 		if settingsVersion < System.Compatibility {
-			err = errors.New(getErrMsg(1013))
+			err = errors.New(GetErrMsg(1013))
 			return
 		}
 
@@ -201,7 +201,7 @@ checkVersion:
 				goto checkVersion
 
 			} else {
-				err = errors.New(getErrMsg(1030))
+				err = errors.New(GetErrMsg(1030))
 				return
 			}
 
@@ -229,7 +229,7 @@ checkVersion:
 				goto checkVersion
 
 			} else {
-				err = errors.New(getErrMsg(1030))
+				err = errors.New(GetErrMsg(1030))
 				return
 			}
 
@@ -241,7 +241,7 @@ checkVersion:
 
 	} else {
 		// settings.json ist zu alt (älter als Version 1.4.4)
-		err = errors.New(getErrMsg(1013))
+		err = errors.New(GetErrMsg(1013))
 	}
 
 	return
@@ -272,7 +272,7 @@ func convertToNewFilter(oldFilter []interface{}) (newFilterMap map[int]interface
 }
 
 func setValueForUUID() (err error) {
-	xepg, err := loadJSONFileToMap(System.File.XEPG)
+	xepg, err := LoadJSONFileToMap(System.File.XEPG)
 
 	for _, c := range xepg {
 

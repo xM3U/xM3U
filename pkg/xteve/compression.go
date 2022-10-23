@@ -128,7 +128,7 @@ func extractGZIP(gzipBody []byte, fileSource string) (body []byte, err error) {
 		return
 	}
 
-	showInfo("Extract gzip:" + fileSource)
+	ShowInfo("Extract gzip:" + fileSource)
 
 	var resB bytes.Buffer
 	_, err = resB.ReadFrom(r)

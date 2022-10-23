@@ -22,7 +22,7 @@ func xTeVeAutoBackup() (err error) {
 		System.Folder.Backup = Settings.BackupPath
 	}
 
-	showInfo("Backup Path:" + System.Folder.Backup)
+	ShowInfo("Backup Path:" + System.Folder.Backup)
 
 	err = checkFolder(System.Folder.Backup)
 	if err != nil {
@@ -54,7 +54,7 @@ func xTeVeAutoBackup() (err error) {
 
 			os.RemoveAll(System.Folder.Backup + oldBackupFiles[i])
 			debug = fmt.Sprintf("Delete backup file:%s", oldBackupFiles[i])
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
 		}
 
@@ -82,9 +82,9 @@ func xTeVeAutoBackup() (err error) {
 		if err == nil {
 
 			debug = fmt.Sprintf("Create backup file:%s", target)
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
-			showInfo("Backup file:" + target)
+			ShowInfo("Backup file:" + target)
 
 		}
 
@@ -93,7 +93,7 @@ func xTeVeAutoBackup() (err error) {
 	return
 }
 
-func xteveBackup() (archiv string, err error) {
+func XteveBackup() (archiv string, err error) {
 	err = checkFolder(System.Folder.Temp)
 	if err != nil {
 		return
@@ -136,7 +136,7 @@ func xteveRestore(archive string) (newWebURL string, err error) {
 	}
 
 	// Neue Config laden um den Port und die Version zu überprüfen
-	newConfig, err := loadJSONFileToMap(tmpRestore + "settings.json")
+	newConfig, err := LoadJSONFileToMap(tmpRestore + "settings.json")
 	if err != nil {
 		ShowError(err, 0)
 		return
@@ -144,7 +144,7 @@ func xteveRestore(archive string) (newWebURL string, err error) {
 
 	backupVersion = newConfig["version"].(string)
 	if backupVersion < System.Compatibility {
-		err = errors.New(getErrMsg(1013))
+		err = errors.New(GetErrMsg(1013))
 		return
 	}
 
@@ -155,7 +155,7 @@ func xteveRestore(archive string) (newWebURL string, err error) {
 	}
 
 	// Neue Config laden um den Port und die Version zu überprüfen
-	newConfig, err = loadJSONFileToMap(System.Folder.Config + "settings.json")
+	newConfig, err = LoadJSONFileToMap(System.Folder.Config + "settings.json")
 	if err != nil {
 		ShowError(err, 0)
 		return
@@ -195,7 +195,7 @@ func xteveRestore(archive string) (newWebURL string, err error) {
 	return
 }
 
-func xteveRestoreFromWeb(input string) (newWebURL string, err error) {
+func XteveRestoreFromWeb(input string) (newWebURL string, err error) {
 	// Base64 Json String in base64 umwandeln
 	b64data := input[strings.IndexByte(input, ',')+1:]
 
@@ -222,9 +222,9 @@ func XteveRestoreFromCLI(archive string) (err error) {
 	var confirm string
 
 	println()
-	showInfo(fmt.Sprintf("Version:%s Build: %s", System.Version, System.Build))
-	showInfo(fmt.Sprintf("Backup File:%s", archive))
-	showInfo(fmt.Sprintf("System Folder:%s", getPlatformPath(System.Folder.Config)))
+	ShowInfo(fmt.Sprintf("Version:%s Build: %s", System.Version, System.Build))
+	ShowInfo(fmt.Sprintf("Backup File:%s", archive))
+	ShowInfo(fmt.Sprintf("System Folder:%s", getPlatformPath(System.Folder.Config)))
 	println()
 
 	fmt.Print("All data will be replaced with those from the backup. Should the files be restored? [yes|no]:")
@@ -257,7 +257,7 @@ func XteveRestoreFromCLI(archive string) (err error) {
 			return
 		}
 
-		showHighlight(fmt.Sprintf("Restor:Backup was successfully restored. %s can now be started normally", System.Name))
+		ShowHighlight(fmt.Sprintf("Restor:Backup was successfully restored. %s can now be started normally", System.Name))
 
 	}
 	return

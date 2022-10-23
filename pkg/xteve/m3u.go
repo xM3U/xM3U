@@ -14,8 +14,8 @@ import (
 
 // Playlisten parsen
 func parsePlaylist(filename, fileType string) (channels []interface{}, err error) {
-	content, err := readByteFromFile(filename)
-	id := strings.TrimSuffix(getFilenameFromPath(filename), path.Ext(getFilenameFromPath(filename)))
+	content, err := ReadByteFromFile(filename)
+	id := strings.TrimSuffix(GetFilenameFromPath(filename), path.Ext(GetFilenameFromPath(filename)))
 	playlistName := getProviderParameter(id, fileType, "name")
 
 	if err == nil {
@@ -168,7 +168,7 @@ func checkConditions(streamValues, conditions, coType string) (status bool) {
 }
 
 // xTeVe M3U Datei erstellen
-func buildM3U(groups []string) (m3u string, err error) {
+func BuildM3U(groups []string) (m3u string, err error) {
 	imgc := Data.Cache.Images
 	m3uChannels := make(map[float64]XEPGChannelStruct)
 	var channelNumbers []float64
@@ -176,12 +176,12 @@ func buildM3U(groups []string) (m3u string, err error) {
 	for _, dxc := range Data.XEPG.Channels {
 
 		var xepgChannel XEPGChannelStruct
-		err := json.Unmarshal([]byte(mapToJSON(dxc)), &xepgChannel)
+		err := json.Unmarshal([]byte(MapToJSON(dxc)), &xepgChannel)
 		if err == nil {
 			if xepgChannel.XActive == true {
 
 				if len(groups) > 0 {
-					if indexOfString(xepgChannel.XGroupTitle, groups) == -1 {
+					if IndexOfString(xepgChannel.XGroupTitle, groups) == -1 {
 						goto Done
 					}
 				}

@@ -62,7 +62,7 @@ func createSystemFiles() (err error) {
 			}
 
 			debug = fmt.Sprintf("Create File:%s", filename)
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
 		}
 
@@ -88,7 +88,7 @@ func createSystemFiles() (err error) {
 
 // Einstellungen laden und default Werte setzen (xTeVe)
 func loadSettings() (settings SettingsStruct, err error) {
-	settingsMap, err := loadJSONFileToMap(System.File.Settings)
+	settingsMap, err := LoadJSONFileToMap(System.File.Settings)
 	if err != nil {
 		return
 	}
@@ -143,7 +143,7 @@ func loadSettings() (settings SettingsStruct, err error) {
 		}
 	}
 
-	err = json.Unmarshal([]byte(mapToJSON(settingsMap)), &settings)
+	err = json.Unmarshal([]byte(MapToJSON(settingsMap)), &settings)
 	if err != nil {
 		return
 	}
@@ -155,7 +155,7 @@ func loadSettings() (settings SettingsStruct, err error) {
 
 	if len(System.Flag.Branch) > 0 {
 		settings.Branch = System.Flag.Branch
-		showInfo(fmt.Sprintf("Git Branch:Switching Git Branch to -> %s", settings.Branch))
+		ShowInfo(fmt.Sprintf("Git Branch:Switching Git Branch to -> %s", settings.Branch))
 	}
 
 	if len(settings.FFmpegPath) == 0 {
@@ -172,11 +172,11 @@ func loadSettings() (settings SettingsStruct, err error) {
 
 	// Warung wenn FFmpeg nicht gefunden wurde
 	if len(Settings.FFmpegPath) == 0 && Settings.Buffer == "ffmpeg" {
-		showWarning(2020)
+		ShowWarning(2020)
 	}
 
 	if len(Settings.VLCPath) == 0 && Settings.Buffer == "vlc" {
-		showWarning(2021)
+		ShowWarning(2021)
 	}
 
 	return
@@ -198,7 +198,7 @@ func saveSettings(settings SettingsStruct) (err error) {
 
 	System.Folder.Temp = settings.TempPath + settings.UUID + string(os.PathSeparator)
 
-	err = writeByteToFile(System.File.Settings, []byte(mapToJSON(settings)))
+	err = writeByteToFile(System.File.Settings, []byte(MapToJSON(settings)))
 	if err != nil {
 		return
 	}
@@ -215,7 +215,7 @@ func saveSettings(settings SettingsStruct) (err error) {
 }
 
 // Zugriff über die Domain ermöglichen
-func setGlobalDomain(domain string) {
+func SetGlobalDomain(domain string) {
 	System.Domain = domain
 
 	switch Settings.AuthenticationPMS {
@@ -240,8 +240,8 @@ func setGlobalDomain(domain string) {
 	}
 
 	if Settings.EpgSource != "XEPG" {
-		System.Addresses.M3U = getErrMsg(2106)
-		System.Addresses.XML = getErrMsg(2106)
+		System.Addresses.M3U = GetErrMsg(2106)
+		System.Addresses.XML = GetErrMsg(2106)
 	}
 
 	return
@@ -308,15 +308,15 @@ func createStreamingURL(streamingType, playlistID, channelNumber, channelName, u
 	return
 }
 
-func getStreamInfo(urlID string) (streamInfo StreamInfo, err error) {
+func GetStreamInfo(urlID string) (streamInfo StreamInfo, err error) {
 	if len(Data.Cache.StreamingURLS) == 0 {
 
-		tmp, err := loadJSONFileToMap(System.File.URLS)
+		tmp, err := LoadJSONFileToMap(System.File.URLS)
 		if err != nil {
 			return streamInfo, err
 		}
 
-		err = json.Unmarshal([]byte(mapToJSON(tmp)), &Data.Cache.StreamingURLS)
+		err = json.Unmarshal([]byte(MapToJSON(tmp)), &Data.Cache.StreamingURLS)
 		if err != nil {
 			return streamInfo, err
 		}

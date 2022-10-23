@@ -12,7 +12,7 @@ import (
 )
 
 // fileType: Welcher Dateityp soll aktualisiert werden (m3u, hdhr, xml) | fileID: Update einer bestimmten Datei (Provider ID)
-func getProviderData(fileType, fileID string) (err error) {
+func GetProviderData(fileType, fileID string) (err error) {
 	var fileExtension, serverFileName string
 	body := make([]byte, 0)
 	newProvider := false
@@ -87,7 +87,7 @@ func getProviderData(fileType, fileID string) (err error) {
 		}
 
 		// Daten überprüfen
-		showInfo("Check File:" + fileSource)
+		ShowInfo("Check File:" + fileSource)
 		switch fileType {
 
 		case "m3u":
@@ -156,7 +156,7 @@ func getProviderData(fileType, fileID string) (err error) {
 		case "hdhr":
 
 			// Laden vom HDHomeRun Tuner
-			showInfo("Tuner:" + fileSource)
+			ShowInfo("Tuner:" + fileSource)
 			tunerURL := "http://" + fileSource + "/lineup.json"
 			serverFileName, body, err = downloadFileFromServer(tunerURL)
 
@@ -165,18 +165,18 @@ func getProviderData(fileType, fileID string) (err error) {
 			if strings.Contains(fileSource, "http://") || strings.Contains(fileSource, "https://") {
 
 				// Laden vom Remote Server
-				showInfo("Download:" + fileSource)
+				ShowInfo("Download:" + fileSource)
 				serverFileName, body, err = downloadFileFromServer(fileSource)
 
 			} else {
 
 				// Laden einer lokalen Datei
-				showInfo("Open:" + fileSource)
+				ShowInfo("Open:" + fileSource)
 
 				err = checkFile(fileSource)
 				if err == nil {
-					body, err = readByteFromFile(fileSource)
-					serverFileName = getFilenameFromPath(fileSource)
+					body, err = ReadByteFromFile(fileSource)
+					serverFileName = GetFilenameFromPath(fileSource)
 				}
 
 			}
@@ -187,7 +187,7 @@ func getProviderData(fileType, fileID string) (err error) {
 
 			err = saveDateFromProvider(fileSource, serverFileName, dataID, body)
 			if err == nil {
-				showInfo("Save File:" + fileSource + " [ID: " + dataID + "]")
+				ShowInfo("Save File:" + fileSource + " [ID: " + dataID + "]")
 			}
 
 		}
@@ -206,7 +206,7 @@ func getProviderData(fileType, fileID string) (err error) {
 				if err == nil {
 
 					if len(fileID) == 0 {
-						showWarning(1011)
+						ShowWarning(1011)
 					}
 
 					err = downloadErr
@@ -295,11 +295,11 @@ func downloadFileFromServer(providerURL string) (filename string, body []byte, e
 
 		f = strings.Replace(f, `;`, "", -1)
 		filename = f
-		showInfo("Header filename:" + filename)
+		ShowInfo("Header filename:" + filename)
 
 	} else {
 
-		cleanFilename := strings.SplitN(getFilenameFromPath(providerURL), "?", 2)
+		cleanFilename := strings.SplitN(GetFilenameFromPath(providerURL), "?", 2)
 		filename = cleanFilename[0]
 
 	}

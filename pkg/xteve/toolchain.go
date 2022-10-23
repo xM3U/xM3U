@@ -32,7 +32,7 @@ func checkFolder(path string) (err error) {
 		if err == nil {
 
 			debug = fmt.Sprintf("Create Folder:%s", path)
-			showDebug(debug, 1)
+			ShowDebug(debug, 1)
 
 		} else {
 			return err
@@ -59,7 +59,7 @@ func checkFile(filename string) (err error) {
 
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
-		err = fmt.Errorf("%s: %s", file, getErrMsg(1072))
+		err = fmt.Errorf("%s: %s", file, GetErrMsg(1072))
 	case mode.IsRegular():
 		break
 	}
@@ -112,7 +112,7 @@ func getPlatformFile(filename string) (osFilePath string) {
 }
 
 // Dateinamen aus dem Dateipfad ausgeben
-func getFilenameFromPath(path string) (file string) {
+func GetFilenameFromPath(path string) (file string) {
 	return filepath.Base(path)
 }
 
@@ -169,7 +169,7 @@ func removeChildItems(dir string) error {
 }
 
 // JSON
-func mapToJSON(tmpMap interface{}) string {
+func MapToJSON(tmpMap interface{}) string {
 	jsonString, err := json.MarshalIndent(tmpMap, "", "  ")
 	if err != nil {
 		return "{}"
@@ -178,7 +178,7 @@ func mapToJSON(tmpMap interface{}) string {
 	return string(jsonString)
 }
 
-func jsonToMap(content string) map[string]interface{} {
+func JsonToMap(content string) map[string]interface{} {
 	tmpMap := make(map[string]interface{})
 	json.Unmarshal([]byte(content), &tmpMap)
 
@@ -212,7 +212,7 @@ func saveMapToJSONFile(file string, tmpMap interface{}) error {
 	return nil
 }
 
-func loadJSONFileToMap(file string) (tmpMap map[string]interface{}, err error) {
+func LoadJSONFileToMap(file string) (tmpMap map[string]interface{}, err error) {
 	f, err := os.Open(getPlatformFile(file))
 	defer f.Close()
 
@@ -228,7 +228,7 @@ func loadJSONFileToMap(file string) (tmpMap map[string]interface{}, err error) {
 }
 
 // Binary
-func readByteFromFile(file string) (content []byte, err error) {
+func ReadByteFromFile(file string) (content []byte, err error) {
 	f, err := os.Open(getPlatformFile(file))
 	defer f.Close()
 
@@ -245,7 +245,7 @@ func writeByteToFile(file string, data []byte) (err error) {
 	return
 }
 
-func readStringFromFile(file string) (str string, err error) {
+func ReadStringFromFile(file string) (str string, err error) {
 	var content []byte
 	filename := getPlatformFile(file)
 
@@ -334,7 +334,7 @@ func randomString(n int) string {
 	return string(bytes)
 }
 
-func parseTemplate(content string, tmpMap map[string]interface{}) (result string) {
+func ParseTemplate(content string, tmpMap map[string]interface{}) (result string) {
 	t := template.Must(template.New("template").Parse(content))
 
 	var tpl bytes.Buffer
@@ -347,7 +347,7 @@ func parseTemplate(content string, tmpMap map[string]interface{}) (result string
 	return
 }
 
-func indexOfString(element string, data []string) int {
+func IndexOfString(element string, data []string) int {
 	for k, v := range data {
 		if element == v {
 			return k
