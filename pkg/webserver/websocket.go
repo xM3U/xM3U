@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var upgrader = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, CheckOrigin: func(r *http.Request) bool { return true }}
+
 // WS : Web Sockets /ws/
 func WS(w http.ResponseWriter, r *http.Request) {
 	var request src.RequestStruct
@@ -17,22 +19,29 @@ func WS(w http.ResponseWriter, r *http.Request) {
 	response.Status = true
 
 	var newToken string
-
-	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
+	conn, err := upgrader.Upgrade(w, r, w.Header())
 	if err != nil {
 		src.ShowError(err, 0)
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
+	defer func() {
+		_ = conn.Close()
+		fmt.Println("Websocket closed")
+	}()
 
 	src.SetGlobalDomain(r.Host)
 
 	for {
+		// Clear previous data
+		response = src.ResponseStruct{}
+		request = src.RequestStruct{}
 
 		err = conn.ReadJSON(&request)
 
 		if err != nil {
-			return
+			src.ShowError(err, 0)
+			break
 		}
 
 		if src.System.ConfigurationWizard == false {
@@ -69,21 +78,25 @@ func WS(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		fmt.Println("+ + + + + + + + + + +", request.Cmd)
+
 		switch request.Cmd {
 		// Daten lesen
 		case "getServerConfig":
 			// response.Config = Settings
 
-		case "updateLog":
+		case "updateLog", "getSystemInfo":
 			response = setDefaultResponseData(response, false)
 			if err = conn.WriteJSON(response); err != nil {
 				src.ShowError(err, 1022)
-			} else {
-				return
-				break
 			}
-			return
-
+			break
+		case "getData":
+			response = setDefaultResponseData(response, true)
+			if err = conn.WriteJSON(response); err != nil {
+				src.ShowError(err, 1022)
+			}
+			break
 		case "loadFiles":
 			// response.Response = src.Settings.Files
 
@@ -230,34 +243,17 @@ func WS(w http.ResponseWriter, r *http.Request) {
 					response.Reload = true
 			*/
 		default:
-			fmt.Println("+ + + + + + + + + + +", request.Cmd)
+			response = setDefaultResponseData(response, true)
+			if src.System.ConfigurationWizard == true {
+				response.ConfigurationWizard = src.System.ConfigurationWizard
+			}
 
-			requestMap := make(map[string]interface{}) // Debug
-			_ = requestMap
-			if src.System.Dev == true {
-				fmt.Println(src.MapToJSON(requestMap))
+			if err = conn.WriteJSON(response); err != nil {
+				src.ShowError(err, 1022)
+			} else {
+				break
 			}
 
 		}
-
-		if err != nil {
-			response.Status = false
-			response.Error = err.Error()
-			response.Settings = src.Settings
-		}
-
-		response = setDefaultResponseData(response, true)
-		if src.System.ConfigurationWizard == true {
-			response.ConfigurationWizard = src.System.ConfigurationWizard
-		}
-
-		if err = conn.WriteJSON(response); err != nil {
-			src.ShowError(err, 1022)
-		} else {
-			break
-		}
-
 	}
-
-	return
 }
