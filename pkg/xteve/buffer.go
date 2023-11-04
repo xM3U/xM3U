@@ -1496,7 +1496,7 @@ func thirdPartyBuffer(streamID int, playlistID string) {
 
 			select {
 			case timeout := <-t:
-				if timeout >= 20 && tmpSegment == 1 {
+				if timeout >= 99 && tmpSegment == 1 {
 					cmd.Process.Kill()
 					err = errors.New("Timout")
 					ShowError(err, 4006)
